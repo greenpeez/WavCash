@@ -842,18 +842,18 @@ export default function DocsPage() {
               <p className="body-text">WavCash uses a hybrid offchain and onchain approach. Stream count data is fetched from DSP APIs via a daily offchain cron job and stored in a managed database. Per-stream rates are sourced from Chainlink Data Feeds and stored onchain in a rates registry on AVAX C-Chain, ensuring that the rate inputs are independently verifiable and not controlled by WavCash. Once per day, a single cryptographic merkle root of the entire dataset is written to AVAX C-Chain in one transaction, creating a tamper-proof permanent record for every rights holder, every track, and every DSP.</p>
 
               <h3 className="section-subtitle">Onchain Contracts</h3>
-              <div className="code-block">{`DataAttestation.sol    Receives daily merkle root writes. Stores timestamp,
-                       root hash, snapshot ID. Public verification function.
+              <div className="code-block">{`WavCashSplit.sol       Per-agreement contract deployed when creator sends
+                       for signatures. EIP-712 signing ceremony fills N
+                       slots; contract auto-activates when all slots signed.
+                       Distributes AVAX and ERC-20 tokens (USDC, EURC)
+                       proportionally to contributors.
+                       States: Signing → Active → terminal.
+                       Functions: registerSigner(), distributeAll(),
+                       distributeAllToken(), void_().
 
-RatesRegistry.sol      Stores per-stream rates fed by Chainlink. Quarterly
-                       updates. Authoritative rate source for oracle.
-
-SplitFactory.sol       Deploys individual Split contracts. Maintains registry
-                       of all agreements.
-
-Split.sol              Per-agreement contract. ISRC, contributor addresses,
-                       share allocations, status enum.
-                       Functions: sign(), amend(), void().`}</div>
+RoyaltySplitter.sol    Legacy contract for earlier agreements. Payee
+                       addresses fixed at deploy time, no signing ceremony.
+                       AVAX distribution only. Immutable.`}</div>
             </section>
 
             {/* Part 5: Pricing */}

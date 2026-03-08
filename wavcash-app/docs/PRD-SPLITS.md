@@ -160,13 +160,13 @@ Voided (2)  -> (terminal)    [cannot be reactivated]
 - Fee sent to `feeRecipient` address on each `distributeAll()` or `distributeAllToken()` call
 - If fee transfer fails (e.g., recipient is a contract that rejects), fees accumulate as `pendingFees` and can be retried via `collectFees()`
 
-### RoyaltySplitter Contract (Legacy)
+### Legacy Contracts
 
-Older splits used a simpler `RoyaltySplitter.sol` that required wallet addresses at deploy time. These contracts:
-- Do NOT support EIP-712 signing (addresses baked in at deployment)
-- Do NOT support `distributeAllToken()` for ERC-20 distribution
-- Still support `distributeAll()` for native AVAX
-- Cannot be upgraded (immutable bytecode)
+There are three generations of deployed contracts:
+
+- **RoyaltySplitter.sol** (oldest): Required wallet addresses at deploy time. No `state()` function, no EIP-712 signing, no ERC-20 distribution support. The cron detects these by the absence of `state()` at the state-check phase and excludes them from the token pass entirely. Still distributes native AVAX via `distributeAll()`. Immutable bytecode.
+- **WavCashSplit v1** (intermediate): Has `state()` and EIP-712 signing, but was deployed before `distributeAllToken()` was added. The cron detects these at call time — `distributeAllToken()` reverts with empty data (unknown function selector) and is silently skipped. Still distributes native AVAX. Immutable bytecode.
+- **WavCashSplit v2** (current): Full support — `state()`, EIP-712 signing, and both AVAX and ERC-20 distribution. All new deployments use this version.
 
 ### Deployment Flow
 
@@ -201,10 +201,11 @@ Adding a new ERC-20 token requires only adding an entry to the `SUPPORTED_TOKENS
 
 **Process:**
 1. Fetches all active splits with deployed contracts
-2. **Native AVAX pass:** For each contract, checks balance. If > 0, calls `distributeAll()`, logs to `distributions` table, notifies contributors
-3. **ERC-20 token pass:** For each supported token (USDC, EURC), checks token balance. If > 0, calls `distributeAllToken()`, logs, notifies
-4. **Fee retry:** After each distribution, checks for stuck fees and retries `collectFees()` / `collectTokenFees()`
-5. Returns stats: `{ distributed, skipped, failed, token_stats, results }`
+2. **Contract state check (separate pass):** Reads on-chain `state()` for each contract in its own try/catch. Contracts not in Active state (1) are skipped. Contracts without `state()` (old RoyaltySplitter) fall through to AVAX distribution without joining the token pass.
+3. **Native AVAX pass:** For each contract, checks balance. If > 0, calls `distributeAll()`, logs to `distributions` table, notifies contributors. Records which contracts confirmed Active for the ERC-20 pass.
+4. **ERC-20 token pass:** Only attempted on contracts confirmed Active in step 2. For each supported token (USDC, EURC), checks token balance. If > 0, calls `distributeAllToken()`, logs, notifies. Contracts that revert with empty data (v1 WavCashSplit without `distributeAllToken()`) are silently skipped — no error log, no DB write.
+5. **Fee retry:** After each successful distribution, checks for stuck fees and retries `collectFees()` / `collectTokenFees()`
+6. Returns stats: `{ distributed, skipped, failed, token_stats, results }`
 
 ### Manual Distribution
 
@@ -701,6 +702,6 @@ interface ContractData {
 6. **Single track per split** -- Each split covers one track. No multi-track agreements.
 7. **Email SVG logo stripped** -- Inline SVG in invite email is stripped by Gmail/Outlook/Yahoo. TODO: replace with hosted PNG when live domain is available.
 8. **No retry for failed emails** -- If individual emails fail during send, there's no retry mechanism. Creator sees sent/failed/skipped counts.
-9. **Legacy contracts lack ERC-20 support** -- Older RoyaltySplitter contracts cannot distribute USDC/EURC. Only new WavCashSplit deployments support `distributeAllToken()`. Old contracts will show "failed" in cron logs for token distribution attempts (expected, non-blocking).
+9. **Legacy contracts lack ERC-20 support** -- Contracts predating ERC-20 support (RoyaltySplitter and early WavCashSplit v1) cannot distribute USDC/EURC. The cron handles these gracefully: RoyaltySplitter contracts (no `state()`) are detected at the state-check phase and excluded from the token pass entirely; v1 WavCashSplit contracts (have `state()` but no `distributeAllToken()`) are detected when they revert with empty data and silently skipped. Neither type produces errors in logs or writes false-failure rows to the database.
 10. **Distribution amount rounding** -- Notification amounts are estimated from `(total * percentage / 100)`. Actual on-chain amounts may differ slightly due to integer division in the smart contract.
 11. **Google Fonts dependency** -- Live signature calligraphy (Dancing Script) requires internet access to load the font. PDF generation via html2pdf.js also depends on this. If the font fails to load, signatures fall back to the default sans-serif font.
