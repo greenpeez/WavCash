@@ -57,7 +57,7 @@ export function EarningsChart({ data }: EarningsChartProps) {
             borderRadius: "8px",
             fontSize: "12px",
           }}
-          formatter={(value: number | string | undefined) => [
+          formatter={(value) => [
             `$${Number(value ?? 0).toFixed(2)}`,
             "Estimated",
           ]}
