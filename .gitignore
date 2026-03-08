@@ -1,6 +1,6 @@
 # Root dependencies (puppeteer, pdf-lib, pptxgenjs)
 node_modules/
-package-lock.json
+/package-lock.json
 
 # Contracts build output (compiled by Hardhat locally — never committed)
 contracts/artifacts/
