@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WavCash — Docs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=General+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ---- THEME CUSTOM PROPERTIES ---- */
+  :root {
+    --bg-body: #0a0a0a;
+    --text-primary: #E8ECF0;
+    --text-secondary: #9AA8B4;
+    --text-tertiary: #788898;
+    --accent: #D4883A;
+    --bg-surface: rgba(232,236,240,0.06);
+    --border-subtle: rgba(232,236,240,0.12);
+    --bg-badge: rgba(255,255,255,0.06);
+    --border-badge: rgba(255,255,255,0.12);
+    --text-badge: #A0A4A8;
+    --text-btn-primary: #000;
+    --bg-btn-primary: #fff;
+    --nav-underline: #fff;
+    --btn-primary-shadow: rgba(255,255,255,0.1);
+    --btn-primary-active-shadow: rgba(255,255,255,0.08);
+  }
+  html.light-mode {
+    --bg-body: #F8F6F3;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5A5A5A;
+    --text-tertiary: #888;
+    --bg-surface: rgba(0,0,0,0.04);
+    --border-subtle: rgba(0,0,0,0.10);
+    --bg-badge: rgba(0,0,0,0.04);
+    --border-badge: rgba(0,0,0,0.10);
+    --text-badge: #777;
+    --text-btn-primary: #F8F6F3;
+    --bg-btn-primary: #1A1A1A;
+    --nav-underline: #1A1A1A;
+    --btn-primary-shadow: rgba(0,0,0,0.08);
+    --btn-primary-active-shadow: rgba(0,0,0,0.06);
+  }
+
+  /* ---- RESET & BASE ---- */
+  * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+  html { scroll-behavior: smooth; }
+
+  /* ---- CUSTOM SCROLLBARS ---- */
+  /* Page vertical scrollbar — hidden */
+  html::-webkit-scrollbar { display: none; }
+  html { scrollbar-width: none; }
+
+  /* Horizontal scrollbars on tables and code blocks — WebKit */
+  .table-wrap::-webkit-scrollbar, .code-block::-webkit-scrollbar { height: 4px; }
+  .table-wrap::-webkit-scrollbar-track, .code-block::-webkit-scrollbar-track { background: transparent; }
+  .table-wrap::-webkit-scrollbar-thumb, .code-block::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 2px;
+  }
+  .table-wrap.is-scrolling::-webkit-scrollbar-thumb,
+  .code-block.is-scrolling::-webkit-scrollbar-thumb {
+    background: rgba(212,136,58,0.45);
+  }
+  html.light-mode .table-wrap.is-scrolling::-webkit-scrollbar-thumb,
+  html.light-mode .code-block.is-scrolling::-webkit-scrollbar-thumb {
+    background: rgba(26,26,26,0.3);
+  }
+  /* Horizontal scrollbars on tables and code blocks — Firefox */
+  .table-wrap, .code-block { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+  .table-wrap.is-scrolling, .code-block.is-scrolling { scrollbar-color: rgba(212,136,58,0.45) transparent; }
+  html.light-mode .table-wrap.is-scrolling,
+  html.light-mode .code-block.is-scrolling { scrollbar-color: rgba(26,26,26,0.3) transparent; }
+
+  /* ---- MERCURY SURFACE CANVAS ---- */
+  canvas#c { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; }
+
+  /* ---- ATOM CURSOR ---- */
+  #atom-cursor {
+    position: fixed; top: 0; left: 0;
+    width: 36px; height: 36px;
+    pointer-events: none;
+    z-index: 9999;
+    will-change: transform;
+    transition: opacity 0.3s ease;
+  }
+  #atom-cursor.hidden { opacity: 0; }
+  body {
+    font-family: 'Plus Jakarta Sans', 'General Sans', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: var(--bg-body);
+    color: var(--text-primary);
+    transition: background 0.6s ease, color 0.6s ease;
+    line-height: 1.7;
+  }
+
+  /* ---- TOP NAV ---- */
+  .top-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: background 0.6s ease, border-color 0.6s ease;
+  }
+  .nav-logo {
+    font-family: 'General Sans', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    transition: color 0.8s ease;
+  }
+  .nav-logo:hover { color: var(--accent); }
+  .nav-logo svg { transition: transform 0.8s ease; }
+  .nav-logo:hover svg { transform: scale(1.08); }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+  .nav-link {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    padding: 4px 0;
+    transition: color 0.8s ease;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1.5px;
+    background: var(--nav-underline);
+    transition: width 0.5s ease, background 0.5s ease;
+  }
+  .nav-link:hover { color: var(--accent); }
+  .nav-link:hover::after { width: 100%; background: var(--accent); }
+  .nav-link.active { color: var(--accent); }
+  .nav-link.active::after { width: 100%; background: var(--accent); }
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 7px 9px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.5s ease;
+  }
+  .theme-toggle:hover {
+    color: var(--accent);
+    border-color: rgba(212,136,58,0.35);
+    background: rgba(212,136,58,0.08);
+  }
+  .theme-toggle svg { width: 16px; height: 16px; transition: transform 0.5s ease; }
+  .theme-toggle:hover svg { transform: rotate(15deg) scale(1.1); }
+  .theme-toggle .icon-sun { display: block; }
+  .theme-toggle .icon-moon { display: none; }
+  html.light-mode .theme-toggle .icon-sun { display: none; }
+  html.light-mode .theme-toggle .icon-moon { display: block; }
+  .nav-cta {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-btn-primary);
+    background: var(--bg-btn-primary);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    transition: transform 0.5s ease, box-shadow 0.5s ease, background 0.4s ease, color 0.4s ease;
+    box-shadow: 0 0 0 0 rgba(255,255,255,0);
+  }
+  .nav-cta:hover {
+    background: var(--accent);
+    color: #000;
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 4px 20px rgba(212,136,58,0.25), 0 0 0 1px rgba(212,136,58,0.15);
+  }
+  .nav-cta:active { transform: scale(0.98); }
+
+  /* ---- SIDEBAR TOC ---- */
+  .sidebar {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    width: 260px;
+    height: calc(100vh - 64px);
+    padding: 72px 24px 32px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    z-index: 50;
+    background: var(--bg-surface);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border-subtle);
+    transform: translateX(-100%);
+    transition: transform 0.35s ease, background 0.6s ease, border-color 0.6s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar::-webkit-scrollbar { display: none; }
+  .toc-list {
+    list-style: none;
+  }
+  .toc-item {
+    margin-bottom: 2px;
+  }
+  .toc-link {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text-tertiary);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    line-height: 1.4;
+  }
+  .toc-link:hover {
+    color: var(--text-secondary);
+    background: var(--bg-surface);
+  }
+  .toc-link.active {
+    color: var(--accent);
+    background: rgba(212,136,58,0.06);
+  }
+  .toc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    opacity: 0.7;
+    min-width: 14px;
+    color: var(--accent);
+  }
+
+  /* ---- SIDEBAR TOGGLE CARD ---- */
+  .sidebar-toggle {
+    display: block;
+    position: fixed;
+    top: 84px;
+    left: 40px;
+    z-index: 55;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: all 0.5s ease;
+  }
+  .sidebar-toggle:hover {
+    color: var(--accent);
+    border-color: rgba(212,136,58,0.35);
+    background: rgba(212,136,58,0.08);
+  }
+
+  /* ---- MAIN CONTENT ---- */
+  .main {
+    padding: 0 40px;
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .content {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  /* ---- COVER SECTION ---- */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding-top: 64px;
+  }
+  .cover-title {
+    font-family: 'General Sans', sans-serif;
+    font-size: clamp(42px, 6vw, 64px);
+    font-weight: 700;
+    letter-spacing: -2.5px;
+    line-height: 1.05;
+    margin-bottom: 20px;
+  }
+  .cover-subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 560px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+    text-align: center;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.5;
+  }
+  .scroll-indicator {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent);
+    z-index: 90;
+    opacity: 0.6;
+    transition: opacity 0.5s ease, color 0.6s ease;
+  }
+  html.light-mode .scroll-indicator { color: var(--text-primary); }
+  .scroll-indicator.hidden { opacity: 0; pointer-events: none; }
+  .scroll-indicator span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .scroll-arrow {
+    width: 16px;
+    height: 16px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+  }
+  @keyframes scroll-nudge {
+    0%, 8% { transform: translateX(-50%) translateY(0); }
+    4% { transform: translateX(-50%) translateY(6px); }
+    12%, 100% { transform: translateX(-50%) translateY(0); }
+  }
+  .scroll-indicator.nudge {
+    animation: scroll-nudge 10s ease-in-out infinite;
+  }
+
+  /* ---- SECTION BLOCKS ---- */
+  .wp-section {
+    padding: 56px 0;
+    border-top: 1px solid rgba(212,136,58,0.25);
+  }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.7;
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-family: 'General Sans', sans-serif;
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    line-height: 1.15;
+    margin-bottom: 32px;
+  }
+  .section-subtitle {
+    font-family: 'General Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+    margin-top: 40px;
+  }
+  .section-subtitle:first-of-type { margin-top: 0; }
+
+  /* ---- BODY TEXT ---- */
+  .body-text {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    text-align: justify;
+  }
+  .body-text:last-child { margin-bottom: 0; }
+
+  /* ---- CASE STUDY CARDS ---- */
+  .case-study {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 24px 0;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+  }
+  .case-study:hover {
+    transform: translateY(-2px);
+    border-color: rgba(212,136,58,0.35);
+    box-shadow: 0 4px 20px rgba(212,136,58,0.08);
+  }
+  .case-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .case-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    text-align: justify;
+  }
+
+  /* ---- PULL QUOTES ---- */
+  .pull-quote {
+    font-family: 'General Sans', sans-serif;
+    font-size: clamp(18px, 2.5vw, 24px);
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    line-height: 1.45;
+    color: var(--text-primary);
+    padding: 32px 0;
+    margin: 24px 0;
+    border-top: 2px solid var(--accent);
+    border-bottom: 1px solid var(--border-subtle);
+    position: relative;
+    transition: color 0.8s ease;
+  }
+  .pull-quote:hover { color: var(--accent); }
+
+  /* ---- DATA TABLES ---- */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 24px 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 500px;
+  }
+  .spec-table th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.7;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(212,136,58,0.25);
+    white-space: nowrap;
+  }
+  .spec-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(212,136,58,0.08);
+    vertical-align: top;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    transition: color 0.5s ease;
+  }
+  .spec-table tbody tr {
+    transition: background 0.5s ease;
+  }
+  .spec-table tbody tr:hover {
+    background: rgba(212,136,58,0.04);
+  }
+  .spec-table tbody tr:hover td {
+    color: var(--text-primary);
+  }
+  .spec-table tbody tr:hover .amber {
+    color: var(--accent);
+  }
+  .spec-table .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .spec-table .amber {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ---- CODE BLOCKS ---- */
+  .code-block {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    overflow-x: auto;
+    color: var(--text-secondary);
+    transition: border-color 0.5s ease, box-shadow 0.5s ease;
+  }
+  .code-block:hover {
+    border-color: rgba(212,136,58,0.25);
+    box-shadow: 0 2px 12px rgba(212,136,58,0.06);
+  }
+
+  /* ---- TIMELINE ---- */
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+    margin: 24px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: var(--border-subtle);
+  }
+  .timeline-item {
+    position: relative;
+    padding: 12px 0;
+    transition: transform 0.5s ease;
+  }
+  .timeline-item:hover {
+    transform: translateX(4px);
+  }
+  .timeline-item:hover .timeline-phase { opacity: 1; }
+  .timeline-item:hover .timeline-focus { color: var(--accent); }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -23px;
+    top: 18px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .timeline-phase {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .timeline-focus {
+    font-family: 'General Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    transition: color 0.5s ease;
+  }
+  .timeline-desc {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    line-height: 1.6;
+    text-align: justify;
+  }
+
+  /* ---- STAT DATA BLOCK ---- */
+  .stat-block {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 12px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+  }
+  .stat-block:hover {
+    transform: translateY(-2px);
+    border-color: rgba(212,136,58,0.35);
+    box-shadow: 0 4px 20px rgba(212,136,58,0.08);
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    flex: 1;
+  }
+  .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* ---- SOURCE FOOTNOTES ---- */
+  .source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+    margin-top: 16px;
+  }
+
+  /* ---- DIVIDER ---- */
+  .divider {
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 0;
+  }
+
+  /* ---- FOOTER ---- */
+  .wp-footer {
+    padding: 100px 0 60px;
+    text-align: center;
+  }
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .footer-logo-text {
+    font-family: 'General Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .footer-tagline {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+  .footer-url {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.5px;
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 768px) {
+    .top-nav { padding: 12px 20px; }
+    .nav-links { display: none; }
+    .nav-cta { display: none; }
+    .main { padding: 0 20px; }
+    .cover-title { letter-spacing: -1.5px; }
+    .cover-meta { flex-direction: column; gap: 8px; }
+    .section-title { margin-bottom: 24px; }
+    .spec-table { font-size: 12px; }
+  }
+
+  /* ---- PRINT ---- */
+  @media print {
+    @page { size: A4; margin: 48px 56px; }
+    body { background: #fff; color: #1A1A1A; }
+    .top-nav, .sidebar, .sidebar-toggle, .theme-toggle, .scroll-indicator, canvas#c, #atom-cursor { display: none !important; }
+    .main { margin-left: 0; padding: 0; max-width: none; }
+    .content { max-width: none; }
+    .cover { min-height: auto; padding-top: 120px; padding-bottom: 80px; page-break-after: always; }
+    .wp-section { page-break-inside: avoid; }
+    .case-study, .code-block, .table-wrap { page-break-inside: avoid; }
+    .spec-table td, .body-text, .case-text { color: #333; }
+    .section-label, .toc-num, .cover-meta { color: #888; }
+    .bg-surface, .case-study, .code-block, .stat-block { backdrop-filter: none; -webkit-backdrop-filter: none; background: #f5f5f5; }
+    .spec-table th { color: #666; border-bottom-color: #ddd; }
+    .spec-table td { border-bottom-color: #eee; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<!-- ATOM CURSOR -->
+<svg id="atom-cursor" width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse class="orbit-path" cx="18" cy="18" rx="14" ry="5" stroke="#D4883A" stroke-width="0.5" opacity="0.15"/>
+  <ellipse class="orbit-path" cx="18" cy="18" rx="14" ry="5" stroke="#D4883A" stroke-width="0.5" opacity="0.15" transform="rotate(60 18 18)"/>
+  <ellipse class="orbit-path" cx="18" cy="18" rx="14" ry="5" stroke="#D4883A" stroke-width="0.5" opacity="0.15" transform="rotate(120 18 18)"/>
+  <circle class="electron" cx="32" cy="18" r="1.8" fill="#D4883A" opacity="0.85"/>
+  <circle class="electron" cx="32" cy="18" r="1.8" fill="#D4883A" opacity="0.85"/>
+  <circle class="electron" cx="32" cy="18" r="1.8" fill="#D4883A" opacity="0.85"/>
+  <circle cx="18" cy="18" r="2.2" fill="#D4883A" opacity="0.9"/>
+  <circle cx="18" cy="18" r="3.5" fill="#D4883A" opacity="0.12"/>
+</svg>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <a href="/" class="nav-logo">
+    <svg width="26" height="22" viewBox="0 0 26 22" fill="none">
+      <line x1="13" y1="2" x2="13" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <line x1="9" y1="4" x2="9" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="17" y1="4" x2="17" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+      <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+    </svg>
+    <span>WavCash</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="#">Product</a>
+    <a class="nav-link" href="#">Royalty Sniffer</a>
+    <a class="nav-link" href="#">Splits</a>
+    <a class="nav-link" href="#">Pricing</a>
+    <a class="nav-link active" href="#">Docs</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" aria-label="Toggle theme">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <button class="nav-cta">Get Early Access</button>
+  </div>
+</nav>
+
+<!-- SIDEBAR TOGGLE CARD -->
+<button class="sidebar-toggle" aria-label="Toggle table of contents">Table of Contents</button>
+
+<!-- SIDEBAR TOC -->
+<aside class="sidebar">
+  <ul class="toc-list">
+    <li class="toc-item"><a href="#executive-summary" class="toc-link active"><span class="toc-num">1</span> Executive Summary</a></li>
+    <li class="toc-item"><a href="#the-problem" class="toc-link"><span class="toc-num">2</span> The Problem</a></li>
+    <li class="toc-item"><a href="#the-solution" class="toc-link"><span class="toc-num">3</span> The Solution</a></li>
+    <li class="toc-item"><a href="#phase-2" class="toc-link"><span class="toc-num">4</span> Phase 2 and Beyond</a></li>
+    <li class="toc-item"><a href="#technical" class="toc-link"><span class="toc-num">5</span> Technical Architecture</a></li>
+    <li class="toc-item"><a href="#pricing" class="toc-link"><span class="toc-num">6</span> Pricing</a></li>
+    <li class="toc-item"><a href="#conclusion" class="toc-link"><span class="toc-num">7</span> Conclusion</a></li>
+  </ul>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+<div class="content">
+
+<!-- COVER -->
+<section class="cover" id="cover">
+  <div style="margin-bottom:24px;">
+    <svg width="48" height="38" viewBox="0 0 26 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+      <line x1="9" y1="4" x2="9" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="13" y1="2" x2="13" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <line x1="17" y1="4" x2="17" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+    </svg>
+  </div>
+  <h1 class="cover-title">WavCash<br>White Paper</h1>
+  <p class="cover-subtitle">Royalty intelligence and payment infrastructure for music rights holders in Africa and Latin America.</p>
+  <div class="cover-meta">
+    <span>wav.cash</span>
+    <span>February 2026</span>
+  </div>
+</section>
+
+<!-- EXECUTIVE SUMMARY -->
+<section class="wp-section" id="executive-summary">
+  <div class="section-label">Executive Summary</div>
+  <h2 class="section-title">The gap between what the fastest-growing music markets earn and what their rights holders receive</h2>
+
+  <p class="body-text">Music rights holders in Africa and Latin America are operating blind. Streaming revenues in these regions grew 22.5 to 22.6 percent in 2024, among the fastest rates anywhere in the world. The infrastructure built to track, verify, and distribute the money those streams generate was designed for different markets, different eras, and different rights holders. The result is a structural gap between what the fastest-growing music markets earn and what their rights holders actually receive.</p>
+
+  <p class="body-text">WavCash is royalty intelligence and payment infrastructure built to close that gap. It aggregates streaming data across every major DSP, calculates what rights holders are owed using tamper-proof verified data, surfaces the difference between expected and actual payouts, guides registration with Collective Management Organizations, and in Phase 2 settles instantly to local currency via M-Pesa, PIX, Paystack, bank transfer, or USDC.</p>
+
+  <p class="body-text">The platform serves all music rights holders: artists, producers, songwriters, session musicians, publishers, and anyone else with a legal stake in a musical work. Independent artists are the primary acquisition channel and the face of the product. Every feature is built for the broader rights holder ecosystem, and the Enterprise tier is designed for labels, managers, and publishers handling multiple catalogs.</p>
+</section>
+
+<!-- PART 1: THE PROBLEM -->
+<section class="wp-section" id="the-problem">
+  <div class="section-label">Part 1</div>
+  <h2 class="section-title">The Problem</h2>
+
+  <h3 class="section-subtitle">Fragmentation by Design</h3>
+  <p class="body-text">A rights holder in Lagos, Nairobi, or Sao Paulo today earns royalties from multiple sources that have nothing to do with each other. Their distributor pays master recording royalties on a monthly or quarterly schedule. Their Collective Management Organization may or may not have their registration on file, and if it does, pays out every six to twelve months after significant administrative delay. YouTube Content ID earnings operate on a separate schedule. Sync licensing deals pay whenever a placement closes.</p>
+  <p class="body-text">Each income stream has its own portal, its own statement format, and its own currency conversion. A rights holder managing even a small catalog across two distributors and one CMO is navigating at minimum three separate dashboards with no unified view of their total earnings.</p>
+
+  <h3 class="section-subtitle">The Registration Gap</h3>
+  <p class="body-text">A significant share of royalties go uncollected in Africa and Latin America because rights holders have never registered their works with the relevant CMOs. In Nigeria, publishing activity accounts for a small fraction of total music industry revenue precisely because rights holders are not registered with organizations like MCSN or COSON. The registration process itself is a barrier. Each CMO has different requirements, different forms, different documentation, and different submission channels. For a producer in Lagos managing multiple tracks across multiple artists, navigating six different CMO processes in four different countries is prohibitive.</p>
+
+  <h3 class="section-subtitle">The Settlement Problem</h3>
+  <p class="body-text">Even when royalties are collected and verified, the last mile fails. Converting USD or EUR royalties to Nigerian naira, Kenyan shillings, or Brazilian reais through traditional banking infrastructure involves three to five percent in conversion costs and processing times measured in days or weeks. For rights holders who depend on royalty income to fund their next project, a two-to-six month payment cycle followed by a slow and expensive conversion is not a financial system. It is a friction machine.</p>
+  <p class="body-text">The payment infrastructure to solve this problem already exists. PIX covers 175 million users across Brazil and processes transactions in seconds. M-Pesa serves over 34 million active users in Kenya alone. Paystack handles approximately 20 percent of all online transactions in Nigeria. For rights holders who prefer to hold or transact in stablecoins, USDC settlement on AVAX C-Chain is also available. What is missing is the collection and intelligence layer that connects royalty income to these payment systems.</p>
+</section>
+
+<!-- PART 2: THE SOLUTION -->
+<section class="wp-section" id="the-solution">
+  <div class="section-label">Part 2</div>
+  <h2 class="section-title">The Solution</h2>
+
+  <h3 class="section-subtitle">Royalty Intelligence, Not Royalty Accounting</h3>
+  <p class="body-text">The fundamental insight behind WavCash is the difference between intelligence and accounting. Accounting tells you what arrived. Intelligence tells you what should have arrived. Existing tools in the market handle accounting. WavCash leads with intelligence.</p>
+  <p class="body-text">The oracle layer sits at the center of the product. It fetches stream counts from every major DSP using track ISRCs, applies published per-stream rates verified independently through Chainlink data feeds, and calculates estimated royalties in real time. Rights holders see what they should be earning before any payment arrives. When payments do arrive, via CSV upload and automatic sync in Phase 3, the platform compares actuals against oracle estimates and flags discrepancies.</p>
+
+  <h3 class="section-subtitle">Data Architecture and Trust</h3>
+  <p class="body-text">The royalty oracle pipeline runs offchain for cost efficiency. Stream count data is fetched via DSP APIs through a daily batch job and stored in a managed database. Per-stream rates are sourced from independently verified onchain data feeds and stored in a rates registry on AVAX C-Chain.</p>
+  <p class="body-text">WavCash uses a hybrid approach: the pipeline itself runs offchain, while trust is enforced through a daily onchain attestation. Once per day, after the full data snapshot is complete, WavCash writes a single cryptographic merkle root of the entire dataset to AVAX C-Chain. If any number in the underlying data were altered, the hash would not match the onchain record. Tampering is detectable and the verification is permanently and publicly auditable.</p>
+
+  <h3 class="section-subtitle">Splits by WavCash</h3>
+  <p class="body-text">Every song has multiple contributors. Producers, co-writers, featured artists, session musicians, and engineers all have legitimate claims on a track's earnings. In practice, these arrangements are governed by verbal agreements, WhatsApp messages, and informal trust. When money arrives, disputes arise. Splits by WavCash creates legally binding, onchain co-ownership records before any money arrives.</p>
+  <p class="body-text">When a track is finished, the rights holder creates a Split agreement: adding each contributor by email with legal name required, or by WavCash ID, a unique platform identifier that auto-populates contributor details. Each contributor is assigned a role and a percentage. The agreement is sent for signatures. An agreement does not become Active until all contributors have signed.</p>
+  <p class="body-text">A WavCash Split is a permanent legal and onchain record. It establishes who owns what. When royalties arrive for that track, distribution to contributors happens manually or through the creator's own arrangements.</p>
+  <p class="body-text">In Phase 2, when virtual account infrastructure activates, automatic redistribution turns on. When royalties arrive for a registered ISRC, WavCash detects the incoming payment, checks whether an active Split agreement exists, and automatically distributes each contributor's share to their preferred settlement method: local currency, or USDC. The creating rights holder forwards nothing manually. The contract executes.</p>
+  <p class="body-text">The key architectural fact is that distributors pay the full royalty amount to whoever registered the track. The distributor has no knowledge of private split arrangements. WavCash operates as the redistribution layer between the distributor payout and the individual contributors.</p>
+
+  <h3 class="section-subtitle">Reclaim: CMO Registration Guide</h3>
+  <p class="body-text">Reclaim is a guided registration tool that helps rights holders navigate CMO registration in their territory. WavCash prepares the complete submission package: pre-filled forms using catalog data and profile data already stored in the system. Rights holders review the package, upload required documents, and receive step-by-step instructions for submitting through the CMO's own channel.</p>
+  <p class="body-text">WavCash does not submit to CMOs directly. CMOs do not have public submission APIs and registration happens through portals, email, or physical mail. WavCash prepares. The rights holder submits. Status tracking and reminder emails keep the process moving.</p>
+  <p class="body-text">Reclaim covers UBC (Nigeria), MCSK (Kenya), SAMRO and CAPASSO (South Africa), ECAD (Brazil), and SACM (Mexico). Each registration wizard includes a per-track payout toggle, default on, that configures routing of distributor royalties through WavCash for instant local settlement or USDC.</p>
+
+  <h3 class="section-subtitle">Enterprise Multi-Seat Dashboard</h3>
+  <p class="body-text">Enterprise accounts serve any rights holder or organization managing three or more artists or works: managers, small labels, independent publishers, and collective groups. Enterprise is not limited to traditional label structures.</p>
+  <p class="body-text">Enterprise provides consolidated roster visibility: total earnings across all artists, Reclaim status per artist per CMO, active Splits across the roster, and team seat management. In Phase 2, Enterprise adds the full label tooling suite: bulk payout management, white-label royalty statements, automatic split redistribution across the roster, and onboarding of artists on the label's behalf. Enterprise customers arriving at the moment payment rails activate bring their entire roster into the payout infrastructure from day one, generating immediate transaction volume.</p>
+</section>
+
+<!-- PART 3: PHASE 2 AND BEYOND -->
+<section class="wp-section" id="phase-2">
+  <div class="section-label">Part 3</div>
+  <h2 class="section-title">Phase 2 and Beyond</h2>
+
+  <h3 class="section-subtitle">Virtual Account Infrastructure</h3>
+  <p class="body-text">Phase 2 activates the payment layer through virtual account infrastructure issued in rights holders' names, rolling out across Africa and Latin America through market-specific Banking-as-a-Service partners.</p>
+  <p class="body-text">Each WavCash account receives a dedicated virtual account in the rights holder's name. The account details are never surfaced in the product UI. The account simply receives royalties.</p>
+  <p class="body-text">When a distributor pays royalties into this account, WavCash detects the incoming payment, identifies the ISRC, checks for active Split agreements, and routes to the rights holder's preferred settlement method: M-Pesa, PIX, Paystack, bank transfer, or USDC.e on AVAX C-Chain. Rights holders who prefer stablecoin settlement get the same instant clearance without any FX conversion cost.</p>
+
+  <h3 class="section-subtitle">Product Roadmap</h3>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-phase">MVP</div>
+      <div class="timeline-focus">Royalty Intelligence</div>
+      <div class="timeline-desc">Oracle dashboard, Royalty Sniffer, Reclaim guide, onchain Splits, Enterprise roster</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 2</div>
+      <div class="timeline-focus">Payments + Enterprise Tools</div>
+      <div class="timeline-desc">Virtual accounts (Nigeria, Brazil, Mexico, South Africa), distributor payout rail, CMO payout rail, full Enterprise suite, local currency and USDC settlement</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 3</div>
+      <div class="timeline-focus">Distribution Intelligence</div>
+      <div class="timeline-desc">Distributor OAuth, Kenya rail, Ghana activation, earnings forecasting, catalog health score</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 4</div>
+      <div class="timeline-focus">Territory Expansion</div>
+      <div class="timeline-desc">Colombia, Argentina, Tanzania</div>
+    </div>
+  </div>
+</section>
+
+<!-- PART 4: TECHNICAL ARCHITECTURE -->
+<section class="wp-section" id="technical">
+  <div class="section-label">Part 4</div>
+  <h2 class="section-title">Technical Architecture</h2>
+
+  <h3 class="section-subtitle">Oracle Architecture</h3>
+  <p class="body-text">WavCash uses a hybrid offchain and onchain approach. Stream count data is fetched from DSP APIs via a daily offchain cron job and stored in a managed database. Per-stream rates are sourced from Chainlink Data Feeds and stored onchain in a rates registry on AVAX C-Chain, ensuring that the rate inputs are independently verifiable and not controlled by WavCash. Once per day, a single cryptographic merkle root of the entire dataset is written to AVAX C-Chain in one transaction, creating a tamper-proof permanent record for every rights holder, every track, and every DSP.</p>
+
+  <h3 class="section-subtitle">Onchain Contracts</h3>
+  <div class="code-block">DataAttestation.sol    Receives daily merkle root writes. Stores timestamp,
+                       root hash, snapshot ID. Public verification function.
+
+RatesRegistry.sol      Stores per-stream rates fed by Chainlink. Quarterly
+                       updates. Authoritative rate source for oracle.
+
+SplitFactory.sol       Deploys individual Split contracts. Maintains registry
+                       of all agreements.
+
+Split.sol              Per-agreement contract. ISRC, contributor addresses,
+                       share allocations, status enum.
+                       Functions: sign(), amend(), void().</div>
+</section>
+
+<!-- PART 5: PRICING -->
+<section class="wp-section" id="pricing">
+  <div class="section-label">Part 5</div>
+  <h2 class="section-title">Pricing</h2>
+
+  <h3 class="section-subtitle">Subscription Tiers</h3>
+  <div class="table-wrap">
+    <table class="spec-table">
+      <thead>
+        <tr><th>Tier</th><th>Annual Price</th><th>Monthly Price</th><th>Seats</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Basic</td><td class="mono">$6.99/month</td><td class="mono">$9.99/month</td><td class="mono">1</td></tr>
+        <tr><td>Premium</td><td class="mono">$11.99/month</td><td class="mono">$14.99/month</td><td class="mono">1</td></tr>
+        <tr><td>Enterprise (3-seat)</td><td class="mono">$45/month</td><td class="mono">$55/month</td><td class="mono">3</td></tr>
+        <tr><td>Enterprise (5-seat)</td><td class="mono">$75/month</td><td class="mono">$85/month</td><td class="mono">5</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CONCLUSION -->
+<section class="wp-section" id="conclusion">
+  <div class="section-label">Conclusion</div>
+  <h2 class="section-title">Your music. Your money. Finally.</h2>
+
+  <p class="body-text">The global music industry is worth $29.6 billion and growing. The fastest-growing markets are Africa and Latin America. The rights holders in those markets are building global careers on infrastructure that was not designed for them: opaque, slow, fragmented, and expensive.</p>
+
+  <p class="body-text">WavCash is transparent by design, fast by architecture, and built from the ground up for the rights holder in Lagos, Sao Paulo, or Nairobi who deserves to know exactly how their music is earning and to have full control over how they receive that money.</p>
+
+  <p class="body-text">The oracle is tamper-proof. The splits are permanent. The payment rails are local. Settlements land in local currency or USDC, whichever the rights holder prefers. WavCash is for everyone: artists, producers, songwriters, session musicians, publishers, and the managers and labels who work with them all.</p>
+</section>
+
+<!-- FOOTER -->
+<div class="wp-footer">
+  <div class="footer-logo">
+    <svg width="22" height="18" viewBox="0 0 26 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+      <line x1="9" y1="4" x2="9" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="13" y1="2" x2="13" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <line x1="17" y1="4" x2="17" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+    </svg>
+    <span class="footer-logo-text">WavCash</span>
+  </div>
+  <div class="footer-tagline">Your royalties, finally visible.</div>
+  <div class="footer-url">wav.cash</div>
+</div>
+
+</div>
+</div>
+
+<!-- SCROLL INDICATOR (fixed to viewport bottom) -->
+<div class="scroll-indicator">
+  <span>Scroll down</span>
+  <div class="scroll-arrow"></div>
+</div>
+
+<script>
+// ============================================================
+//  THEME — init from localStorage
+// ============================================================
+var isLightMode = localStorage.getItem('wavcash-theme') === 'light';
+if (isLightMode) document.documentElement.classList.add('light-mode');
+
+// ============================================================
+//  MERCURY SURFACE — WebGL2
+// ============================================================
+(function() {
+  const canvas = document.getElementById('c');
+  const gl = canvas.getContext('webgl2', { antialias: false, alpha: false });
+  if (!gl) { console.warn('No WebGL2'); return; }
+  gl.getExtension('EXT_color_buffer_float');
+  const SIM = 512;
+
+  // ---- Shaders ----
+  const VERT = `#version 300 es
+layout(location=0) in vec2 pos;
+out vec2 uv;
+void main(){ uv=pos*0.5+0.5; gl_Position=vec4(pos,0,1); }`;
+
+  const FRAG_DROP = `#version 300 es
+precision highp float;
+uniform sampler2D src; uniform vec2 center; uniform float radius; uniform float strength;
+in vec2 uv; out vec4 dst;
+void main(){
+  vec4 s=texture(src,uv);
+  float d=distance(uv,center);
+  s.r+=exp(-d*d/(radius*radius))*strength*0.04;
+  dst=s;
+}`;
+
+  const FRAG_UPDATE = `#version 300 es
+precision highp float;
+uniform sampler2D src; uniform vec2 texel;
+in vec2 uv; out vec4 dst;
+void main(){
+  vec4 s=texture(src,uv);
+  float n=texture(src,uv+vec2(0,texel.y)).r;
+  float south=texture(src,uv-vec2(0,texel.y)).r;
+  float e=texture(src,uv+vec2(texel.x,0)).r;
+  float w=texture(src,uv-vec2(texel.x,0)).r;
+  float avg=(n+south+e+w)*0.25;
+  s.g+=(avg-s.r)*0.18; s.g*=0.945; s.r+=s.g; s.r*=0.9992;
+  vec2 a=smoothstep(vec2(0),vec2(0.01),uv);
+  vec2 b=smoothstep(vec2(0),vec2(0.01),1.0-uv);
+  s.rg*=a.x*a.y*b.x*b.y;
+  dst=s;
+}`;
+
+  const FRAG_RENDER = `#version 300 es
+precision highp float;
+uniform sampler2D hmap; uniform vec2 texel; uniform vec2 res; uniform float time; uniform int uLightMode;
+in vec2 uv; out vec4 fc;
+vec3 getNorm(vec2 p){
+  float l=texture(hmap,p-vec2(texel.x,0)).r;
+  float r=texture(hmap,p+vec2(texel.x,0)).r;
+  float u=texture(hmap,p+vec2(0,texel.y)).r;
+  float d=texture(hmap,p-vec2(0,texel.y)).r;
+  float ns=uLightMode==1?2.0:1.0;
+  return normalize(vec3((l-r)*ns,(d-u)*ns,1.0));
+}
+vec3 env(vec3 rd){
+  float y=rd.y;
+  vec3 dark,mid,tint; float limiter;
+  if(uLightMode==1){ dark=vec3(0.62); mid=vec3(0.78,0.78,0.77); tint=vec3(0.92,0.91,0.89); limiter=0.93; }
+  else{ dark=vec3(0.01); mid=vec3(0.08,0.08,0.07); tint=vec3(0.25,0.24,0.22); limiter=0.12; }
+  vec3 c=mix(dark,mid,smoothstep(-0.5,1.0,y));
+  float b1=smoothstep(0.2,0.35,y)*(1.0-smoothstep(0.55,0.65,y)); c+=tint*0.25*b1;
+  float b2=smoothstep(0.7,0.78,y)*(1.0-smoothstep(0.85,0.92,y)); c+=tint*0.15*b2;
+  c+=dark*1.5*smoothstep(-0.8,-0.3,y)*(1.0-smoothstep(-0.05,0.15,y));
+  c*=0.90+0.10*(sin(rd.x*3.0+rd.z*1.5)*0.5+0.5);
+  c=min(c,vec3(limiter));
+  return c;
+}
+void main(){
+  vec3 N=getNorm(uv);
+  float asp=res.x/res.y;
+  vec3 V=normalize(vec3((uv-0.5)*vec2(asp,1.0)*0.3,-1.0));
+  vec3 R=reflect(V,N);
+  float NdotV=max(dot(N,-V),0.0);
+  float fLo=uLightMode==1?0.75:0.65;
+  float fHi=uLightMode==1?0.90:0.75;
+  float fresnel=mix(fLo,fHi,1.0-NdotV);
+  vec3 c=env(R)*fresnel;
+  c=(c*(2.51*c+0.03))/(c*(2.43*c+0.59)+0.14);
+  c=pow(clamp(c,0.0,1.0),vec3(1.0/2.2));
+  if(uLightMode==0){ c=min(c,vec3(0.20)); }
+  fc=vec4(c,1);
+}`;
+
+  // ---- Compile helpers ----
+  function mkS(src,type){ const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s); if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){console.error(gl.getShaderInfoLog(s));return null;} return s; }
+  function mkP(vs,fs){ const v=mkS(vs,gl.VERTEX_SHADER),f=mkS(fs,gl.FRAGMENT_SHADER); if(!v||!f)return null; const p=gl.createProgram(); gl.attachShader(p,v); gl.attachShader(p,f); gl.linkProgram(p); if(!gl.getProgramParameter(p,gl.LINK_STATUS)){console.error(gl.getProgramInfoLog(p));return null;} return p; }
+
+  // ---- Quad VAO ----
+  const vao=gl.createVertexArray(); gl.bindVertexArray(vao);
+  const buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+  gl.bindVertexArray(null);
+
+  // ---- Programs ----
+  const pDrop=mkP(VERT,FRAG_DROP), pUpdate=mkP(VERT,FRAG_UPDATE), pRender=mkP(VERT,FRAG_RENDER);
+  if(!pDrop||!pUpdate||!pRender){ console.error('Shader compile failed'); return; }
+
+  function U(p,...n){ const o={}; for(const k of n) o[k]=gl.getUniformLocation(p,k); return o; }
+  const uDrop=U(pDrop,'src','center','radius','strength');
+  const uUpdate=U(pUpdate,'src','texel');
+  const uRender=U(pRender,'hmap','texel','res','time','uLightMode');
+
+  // ---- Ping-pong textures ----
+  function mkTex(){ const t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t); gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,SIM,SIM,0,gl.RGBA,gl.FLOAT,null); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE); return t; }
+  function mkFBO(t){ const f=gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER,f); gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,t,0); gl.bindFramebuffer(gl.FRAMEBUFFER,null); return f; }
+
+  const tex=[mkTex(),mkTex()], fbo=[mkFBO(tex[0]),mkFBO(tex[1])];
+  let cR=0, cW=1;
+  function swap(){ const t=cR; cR=cW; cW=t; }
+
+  // ---- Sim functions ----
+  function runDrop(cx,cy,rad,str){
+    gl.viewport(0,0,SIM,SIM); gl.useProgram(pDrop); gl.bindFramebuffer(gl.FRAMEBUFFER,fbo[cW]);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,tex[cR]);
+    gl.uniform1i(uDrop.src,0); gl.uniform2f(uDrop.center,cx,cy); gl.uniform1f(uDrop.radius,rad); gl.uniform1f(uDrop.strength,str);
+    gl.bindVertexArray(vao); gl.drawArrays(gl.TRIANGLE_STRIP,0,4); swap();
+  }
+  function runUpdate(){
+    gl.viewport(0,0,SIM,SIM); gl.useProgram(pUpdate); gl.bindFramebuffer(gl.FRAMEBUFFER,fbo[cW]);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,tex[cR]);
+    gl.uniform1i(uUpdate.src,0); gl.uniform2f(uUpdate.texel,1/SIM,1/SIM);
+    gl.bindVertexArray(vao); gl.drawArrays(gl.TRIANGLE_STRIP,0,4); swap();
+  }
+
+  // ---- Cursor tracking ----
+  let mx=0.5, my=0.5, pmx=0.5, pmy=0.5, smoothStr=0, lastMove=0;
+  document.addEventListener('mousemove', function(e){ mx=e.clientX/window.innerWidth; my=1-e.clientY/window.innerHeight; lastMove=performance.now(); });
+  document.addEventListener('touchmove', function(e){ mx=e.touches[0].clientX/window.innerWidth; my=1-e.touches[0].clientY/window.innerHeight; lastMove=performance.now(); }, {passive:true});
+  document.addEventListener('touchstart', function(e){ mx=e.touches[0].clientX/window.innerWidth; my=1-e.touches[0].clientY/window.innerHeight; lastMove=performance.now(); });
+
+  // ---- Resize ----
+  function resize(){ const d=Math.min(devicePixelRatio||1,2); canvas.width=Math.round(canvas.clientWidth*d); canvas.height=Math.round(canvas.clientHeight*d); }
+  resize(); addEventListener('resize',resize);
+
+  // ---- Render loop ----
+  const t0=performance.now(); let frame=0;
+  function loop(){
+    requestAnimationFrame(loop);
+    const now=performance.now(), time=(now-t0)*0.001; frame++;
+    const dx=mx-pmx, dy=my-pmy, vel=Math.sqrt(dx*dx+dy*dy)*60;
+    pmx=mx; pmy=my;
+    const moving=(now-lastMove)<150;
+    const rawStr=moving?0.15+Math.min(vel,3)*0.15:0;
+    if(rawStr>=smoothStr) smoothStr=rawStr; else smoothStr+=(rawStr-smoothStr)*0.04;
+    if(smoothStr>0.001) runDrop(mx,my,0.015,smoothStr);
+    runUpdate();
+    if(!moving&&frame%90===0){ runDrop(0.15+Math.random()*0.7,0.15+Math.random()*0.7,0.035,0.04); }
+    gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+    gl.viewport(0,0,canvas.width,canvas.height);
+    gl.useProgram(pRender);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,tex[cR]);
+    gl.uniform1i(uRender.hmap,0); gl.uniform2f(uRender.texel,1/SIM,1/SIM);
+    gl.uniform2f(uRender.res,canvas.width,canvas.height);
+    gl.uniform1f(uRender.time,time); gl.uniform1i(uRender.uLightMode,isLightMode?1:0);
+    gl.bindVertexArray(vao); gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  }
+  requestAnimationFrame(loop);
+})();
+
+// ============================================================
+//  ATOM CURSOR — spinning electrons on tilted elliptical orbits
+// ============================================================
+(function() {
+  var cursor = document.getElementById('atom-cursor');
+  if (!cursor) return;
+  var electrons = cursor.querySelectorAll('.electron');
+  var curX = -100, curY = -100, targetX = -100, targetY = -100;
+
+  document.addEventListener('mousemove', function(e){ targetX=e.clientX; targetY=e.clientY; });
+  document.addEventListener('touchmove', function(e){ targetX=e.touches[0].clientX; targetY=e.touches[0].clientY; }, {passive:true});
+
+  var hideSelectors = 'button, .nav-cta, .nav-link, .toc-link, input, textarea, select, a';
+  document.addEventListener('mouseover', function(e){ if(e.target.closest(hideSelectors)) cursor.classList.add('hidden'); });
+  document.addEventListener('mouseout', function(e){ if(e.target.closest(hideSelectors)) cursor.classList.remove('hidden'); });
+  document.addEventListener('mouseleave', function(){ cursor.classList.add('hidden'); });
+  document.addEventListener('mouseenter', function(){ cursor.classList.remove('hidden'); });
+
+  var orbits = [
+    { rx:14, ry:5, tilt:0,   speed:1.8 },
+    { rx:14, ry:5, tilt:60,  speed:2.3 },
+    { rx:14, ry:5, tilt:120, speed:1.5 },
+  ];
+
+  function animate(now) {
+    requestAnimationFrame(animate);
+    var t = now * 0.001;
+    curX += (targetX - curX) * 0.25;
+    curY += (targetY - curY) * 0.25;
+    cursor.style.transform = 'translate(' + (curX-18) + 'px,' + (curY-18) + 'px)';
+    for (var i = 0; i < 3; i++) {
+      var o = orbits[i];
+      var angle = t * o.speed + (i * Math.PI * 2 / 3);
+      var ex = Math.cos(angle) * o.rx, ey = Math.sin(angle) * o.ry;
+      var rad = o.tilt * Math.PI / 180;
+      var rx = ex * Math.cos(rad) - ey * Math.sin(rad);
+      var ry = ex * Math.sin(rad) + ey * Math.cos(rad);
+      electrons[i].setAttribute('cx', 18 + rx);
+      electrons[i].setAttribute('cy', 18 + ry);
+      var depth = Math.sin(angle);
+      electrons[i].setAttribute('opacity', (0.35 + depth * 0.55).toFixed(2));
+    }
+  }
+  requestAnimationFrame(animate);
+
+  // Sync cursor colors on init if light mode
+  if (isLightMode) {
+    var cc = '#1A1A1A';
+    cursor.querySelectorAll('.orbit-path').forEach(function(el){ el.setAttribute('stroke', cc); });
+    cursor.querySelectorAll('.electron').forEach(function(el){ el.setAttribute('fill', cc); });
+    cursor.querySelectorAll('circle:not(.electron)').forEach(function(el){ el.setAttribute('fill', cc); });
+  }
+})();
+
+// ============================================================
+//  THEME TOGGLE
+// ============================================================
+function toggleTheme() {
+  isLightMode = !isLightMode;
+  document.documentElement.classList.toggle('light-mode', isLightMode);
+  localStorage.setItem('wavcash-theme', isLightMode ? 'light' : 'dark');
+
+  // Update atom cursor colors
+  var cc = isLightMode ? '#1A1A1A' : '#D4883A';
+  document.querySelectorAll('#atom-cursor .orbit-path').forEach(function(el){ el.setAttribute('stroke', cc); });
+  document.querySelectorAll('#atom-cursor .electron').forEach(function(el){ el.setAttribute('fill', cc); });
+  document.querySelectorAll('#atom-cursor circle:not(.electron)').forEach(function(el){ el.setAttribute('fill', cc); });
+}
+
+document.querySelector('.theme-toggle').addEventListener('click', toggleTheme);
+
+// Keyboard shortcut: L to toggle theme
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'l' || e.key === 'L') toggleTheme();
+});
+
+// ============================================================
+//  SIDEBAR — toggle + close on link click
+// ============================================================
+document.querySelector('.sidebar-toggle').addEventListener('click', function() {
+  document.querySelector('.sidebar').classList.toggle('open');
+});
+document.querySelectorAll('.toc-link').forEach(function(link) {
+  link.addEventListener('click', function() {
+    document.querySelector('.sidebar').classList.remove('open');
+  });
+});
+
+// ============================================================
+//  SCROLL INDICATOR — fixed at viewport bottom, hide on scroll
+// ============================================================
+(function() {
+  var indicator = document.querySelector('.scroll-indicator');
+  if (!indicator) return;
+  indicator.classList.add('nudge');
+  var hidden = false;
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 10 && !hidden) {
+      indicator.classList.remove('nudge');
+      indicator.classList.add('hidden');
+      hidden = true;
+    } else if (window.scrollY <= 0 && hidden) {
+      indicator.classList.remove('hidden');
+      indicator.classList.add('nudge');
+      hidden = false;
+    }
+  });
+})();
+
+// ============================================================
+//  SCROLLBAR VISIBILITY — tables/code: show on scroll, hide 1s after
+// ============================================================
+(function() {
+  document.querySelectorAll('.table-wrap, .code-block').forEach(function(el) {
+    var elTimer;
+    el.addEventListener('scroll', function() {
+      el.classList.add('is-scrolling');
+      clearTimeout(elTimer);
+      elTimer = setTimeout(function() {
+        el.classList.remove('is-scrolling');
+      }, 1000);
+    });
+  });
+})();
+
+// ============================================================
+//  SCROLL SPY — sidebar TOC
+// ============================================================
+(function() {
+  var sections = document.querySelectorAll('.wp-section, .cover');
+  var links = document.querySelectorAll('.toc-link');
+  if (!sections.length || !links.length) return;
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var id = entry.target.id;
+        links.forEach(function(link) {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(function(section) {
+    if (section.id) observer.observe(section);
+  });
+})();
+</script>
+</body>
+</html>

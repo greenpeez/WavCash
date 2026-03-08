@@ -1,0 +1,22 @@
+# Root dependencies (puppeteer, pdf-lib, pptxgenjs)
+node_modules/
+package-lock.json
+
+# Contracts build output (compiled by Hardhat locally — never committed)
+contracts/artifacts/
+contracts/cache/
+contracts/node_modules/
+contracts/package-lock.json
+
+# Next.js app has its own .gitignore — these are extra root-level guards
+.env
+.env.local
+.env*.local
+
+# OS
+.DS_Store
+*.pem
+
+# Local tooling config
+.claude/
+.vercel

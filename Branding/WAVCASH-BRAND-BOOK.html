@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WavCash Brand Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=General+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ========================================
+     WavCash Brand Book
+     Save as PDF: Cmd+P → Save as PDF
+     ======================================== */
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --dark-bg: #141413;
+    --light-bg: #F8F6F3;
+    --amber: #D4883A;
+    --text-light: #E8ECF0;
+    --text-dark: #1A1A1A;
+    --text-muted-light: #9AA8B4;
+    --text-muted-dark: #5A5A5A;
+    --page-w: 210mm;
+    --page-h: 297mm;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', 'General Sans', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: #1a1a1a;
+  }
+
+  /* ---- PAGE SYSTEM ---- */
+  .page {
+    width: var(--page-w);
+    height: var(--page-h);
+    margin: 0 auto 20px;
+    padding: 48px 56px;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+  }
+  .page:last-child { margin-bottom: 0; }
+
+  .page-dark { background: var(--dark-bg); color: var(--text-light); }
+  .page-light { background: var(--light-bg); color: var(--text-dark); }
+  .page-black { background: #000; color: var(--text-light); }
+
+  /* ---- TYPOGRAPHY ---- */
+  .font-display { font-family: 'General Sans', sans-serif; }
+  .font-body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+  .page-number {
+    position: absolute;
+    bottom: 32px;
+    right: 56px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    opacity: 0.3;
+    letter-spacing: 1px;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.4;
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    font-family: 'General Sans', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  .section-subtitle {
+    font-family: 'General Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+    margin-top: 32px;
+  }
+
+  .section-subtitle:first-of-type { margin-top: 0; }
+
+  .body-text {
+    font-size: 13px;
+    line-height: 1.7;
+    opacity: 0.7;
+    max-width: 480px;
+  }
+
+  .divider {
+    height: 1px;
+    background: currentColor;
+    opacity: 0.08;
+    margin: 24px 0;
+  }
+
+  .small-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.35;
+  }
+
+  /* ========== COVER PAGE ========== */
+  .cover {
+    justify-content: flex-end;
+    padding: 64px;
+  }
+
+  .cover-logo {
+    position: absolute;
+    top: 64px;
+    left: 64px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .cover-logo svg { opacity: 0.9; }
+
+  .cover-logo-text {
+    font-family: 'General Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text-light);
+  }
+
+  .cover-badge {
+    position: absolute;
+    top: 64px;
+    right: 64px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.3;
+  }
+
+  .cover-title {
+    font-family: 'General Sans', sans-serif;
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: -3px;
+    line-height: 1.0;
+    margin-bottom: 16px;
+  }
+
+  .cover-title .amber { color: var(--amber); }
+
+  .cover-sub {
+    font-size: 16px;
+    opacity: 0.4;
+    letter-spacing: 0.5px;
+    margin-bottom: 80px;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+    opacity: 0.25;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Subtle gradient overlay on cover */
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: radial-gradient(ellipse at 70% 20%, rgba(212,136,58,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ========== COLOR SWATCHES ========== */
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .swatch {
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 80px;
+    position: relative;
+  }
+
+  .swatch-name {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+  }
+
+  .swatch-hex {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    opacity: 0.6;
+  }
+
+  .swatch-dark { border: 1px solid rgba(255,255,255,0.08); }
+  .swatch-light { border: 1px solid rgba(0,0,0,0.08); }
+
+  /* ========== LOGO SHOWCASE ========== */
+  .logo-showcase {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 80px;
+  }
+
+  .logo-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .logo-frame {
+    width: 160px;
+    height: 160px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-frame svg {
+    transform: scale(4);
+  }
+
+  .logo-frame-dark {
+    background: var(--dark-bg);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .logo-frame-light {
+    background: var(--light-bg);
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .logo-frame-amber {
+    background: var(--amber);
+  }
+
+  .logo-caption {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.4;
+  }
+
+  /* ========== LOGO ANATOMY ========== */
+  .anatomy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 24px;
+  }
+
+  .anatomy-item {
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .anatomy-item .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.35;
+    margin-bottom: 8px;
+  }
+
+  .anatomy-item .value {
+    font-family: 'General Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .anatomy-item .detail {
+    font-size: 11px;
+    opacity: 0.5;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  /* ========== TYPE SPECIMEN ========== */
+  .type-specimen {
+    margin-bottom: 28px;
+  }
+
+  .specimen-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.3;
+    margin-bottom: 8px;
+  }
+
+  .specimen-sample-display {
+    font-family: 'General Sans', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+
+  .specimen-sample-body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.6;
+    opacity: 0.7;
+    margin-bottom: 4px;
+  }
+
+  .specimen-sample-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 400;
+    opacity: 0.5;
+    margin-bottom: 4px;
+  }
+
+  .specimen-meta {
+    font-size: 10px;
+    opacity: 0.35;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+
+  /* ========== COMPONENT CARDS ========== */
+  .component-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .comp-card {
+    flex: 1;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .comp-card-dark {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .comp-card-light {
+    background: rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .comp-state {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.3;
+    margin-bottom: 12px;
+  }
+
+  /* Mock button styles */
+  .mock-btn-primary {
+    display: inline-block;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  .mock-btn-secondary {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    border: 1px solid;
+  }
+
+  .mock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .mock-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  /* ========== MOCKUP SECTION ========== */
+  .mockup-frame {
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    padding: 28px 32px;
+    margin-bottom: 16px;
+  }
+
+  .mockup-dark {
+    background: var(--dark-bg);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .mockup-light {
+    background: var(--light-bg);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .mockup-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  .mockup-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mockup-nav-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .mockup-nav-link {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.5;
+  }
+
+  .mockup-nav-cta {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 6px;
+    letter-spacing: 0.2px;
+  }
+
+  .mockup-hero {
+    text-align: center;
+    padding: 24px 0 16px;
+  }
+
+  .mockup-hero-title {
+    font-family: 'General Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .mockup-hero-sub {
+    font-size: 10px;
+    opacity: 0.5;
+    margin-bottom: 16px;
+  }
+
+  .mockup-hero-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .mockup-hero-actions .btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  /* ========== AMBER SCALE ========== */
+  .amber-scale {
+    display: flex;
+    gap: 4px;
+    margin: 16px 0;
+  }
+
+  .amber-swatch {
+    flex: 1;
+    height: 48px;
+    border-radius: 6px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 6px;
+  }
+
+  .amber-swatch span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    opacity: 0.7;
+  }
+
+  /* ========== TABLE ========== */
+  .spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    margin-bottom: 20px;
+  }
+
+  .spec-table th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.3;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .page-light .spec-table th {
+    border-bottom-color: rgba(0,0,0,0.06);
+  }
+
+  .spec-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    vertical-align: top;
+  }
+
+  .page-light .spec-table td {
+    border-bottom-color: rgba(0,0,0,0.03);
+  }
+
+  .spec-table .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+  }
+
+  /* ========== MOTION TIMELINE ========== */
+  .timeline {
+    position: relative;
+    padding-left: 20px;
+    margin: 16px 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .page-light .timeline::before {
+    background: rgba(0,0,0,0.08);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding: 8px 0;
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -19px;
+    top: 14px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--amber);
+  }
+
+  .timeline-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    opacity: 0.4;
+    min-width: 36px;
+  }
+
+  .timeline-desc {
+    font-size: 12px;
+    opacity: 0.6;
+  }
+
+  /* ========== SHADER PARAMS ========== */
+  .param-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0;
+  }
+
+  .param-item {
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .page-light .param-item {
+    background: rgba(0,0,0,0.02);
+    border-color: rgba(0,0,0,0.04);
+  }
+
+  .param-item .param-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.3;
+    margin-bottom: 4px;
+  }
+
+  .param-item .param-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* ========== PRINT OVERRIDES ========== */
+  @media print {
+    body { background: none; }
+    .page { margin: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+
+<!-- ================================
+     PAGE 1 - COVER
+     ================================ -->
+<div class="page page-dark cover">
+  <div class="cover-logo">
+    <svg width="26" height="22" viewBox="0 0 26 22" fill="none">
+      <line x1="13" y1="2" x2="13" y2="20" stroke="#E8ECF0" stroke-width="3" stroke-linecap="round"/>
+      <line x1="9" y1="4" x2="9" y2="18" stroke="#E8ECF0" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="17" y1="4" x2="17" y2="18" stroke="#E8ECF0" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="#E8ECF0" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+      <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="#E8ECF0" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+    </svg>
+    <span class="cover-logo-text">WavCash</span>
+  </div>
+  <div class="cover-badge">Confidential</div>
+
+  <div class="cover-title">Brand<br>Guide<span class="amber">.</span></div>
+  <div class="cover-sub">Visual identity system &amp; design specifications</div>
+
+  <div class="cover-meta">
+    <span>Version 1.0</span>
+    <span>February 2026</span>
+    <span>WavCash Inc.</span>
+  </div>
+  <div class="page-number">01</div>
+</div>
+
+
+<!-- ================================
+     PAGE 2 - BRAND OVERVIEW
+     ================================ -->
+<div class="page page-dark">
+  <div class="section-label">01 / Brand Overview</div>
+  <div class="section-title">Your royalties,<br>finally visible<span style="color:var(--amber)">.</span></div>
+
+  <div class="body-text" style="margin-bottom:32px;">
+    WavCash is a royalty intelligence platform for independent artists across Africa and Latin America. Instant verification. Transparent payouts. The brand communicates through material quality: liquid mercury, chrome surfaces. Never loud graphics. Every interaction feels considered.
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-subtitle">Tone of Voice</div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:32px;">
+    <div>
+      <div class="small-label" style="margin-bottom:6px;">We Are</div>
+      <div style="font-size:13px; opacity:0.6; line-height:1.7;">Precise. Confident. Understated. Transparent. Built for artists who create, not corporations who extract.</div>
+    </div>
+    <div>
+      <div class="small-label" style="margin-bottom:6px;">We Sound Like</div>
+      <div style="font-size:13px; opacity:0.6; line-height:1.7;">A trusted advisor who speaks plainly. No hype. No jargon. Just clarity about where your money is and how to get it.</div>
+    </div>
+    <div>
+      <div class="small-label" style="margin-bottom:6px;">We Never</div>
+      <div style="font-size:13px; opacity:0.6; line-height:1.7;">Oversell. Use exclamation marks. Make promises about earnings. Talk down to artists or patronize emerging markets.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-subtitle">Key Copy</div>
+  <table class="spec-table">
+    <tr><th>Element</th><th>Copy</th></tr>
+    <tr><td>Tagline</td><td>Your royalties, finally visible.</td></tr>
+    <tr><td>Badge</td><td class="mono">NOW IN PRIVATE BETA</td></tr>
+    <tr><td>Primary CTA</td><td>Get Early Access</td></tr>
+    <tr><td>Secondary CTA</td><td>Claim Your Royalties / See How It Works</td></tr>
+    <tr><td>Search</td><td class="mono" style="opacity:0.5;">Search any ISRC, artist, or track...</td></tr>
+  </table>
+
+  <div class="page-number">02</div>
+</div>
+
+
+<!-- ================================
+     PAGE 3 - LOGO
+     ================================ -->
+<div class="page page-dark">
+  <div class="section-label">02 / Logo</div>
+  <div class="section-title">The Diffraction<span style="color:var(--amber)">.</span></div>
+
+  <div class="body-text" style="margin-bottom:32px;">
+    A single-slit diffraction pattern: a bold central bar flanked by progressively thinner, fainter bars. This is how sound and light behave when they pass through an opening. The invisible, made visible. Inspired by wave optics, directly echoing the tagline.
+  </div>
+
+  <div class="logo-showcase">
+    <div class="logo-display">
+      <div class="logo-frame logo-frame-dark">
+        <svg width="26" height="22" viewBox="0 0 26 22" fill="none">
+          <line x1="13" y1="2" x2="13" y2="20" stroke="#E8ECF0" stroke-width="3" stroke-linecap="round"/>
+          <line x1="9" y1="4" x2="9" y2="18" stroke="#E8ECF0" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="17" y1="4" x2="17" y2="18" stroke="#E8ECF0" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="#E8ECF0" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+          <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="#E8ECF0" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+        </svg>
+      </div>
+      <div class="logo-caption">Dark Mode</div>
+    </div>
+
+    <div class="logo-display">
+      <div class="logo-frame logo-frame-light">
+        <svg width="26" height="22" viewBox="0 0 26 22" fill="none">
+          <line x1="13" y1="2" x2="13" y2="20" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
+          <line x1="9" y1="4" x2="9" y2="18" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="17" y1="4" x2="17" y2="18" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="#1A1A1A" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+          <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="#1A1A1A" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+        </svg>
+      </div>
+      <div class="logo-caption">Light Mode</div>
+    </div>
+
+    <div class="logo-display">
+      <div class="logo-frame logo-frame-amber">
+        <svg width="26" height="22" viewBox="0 0 26 22" fill="none">
+          <line x1="13" y1="2" x2="13" y2="20" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+          <line x1="9" y1="4" x2="9" y2="18" stroke="#000" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="17" y1="4" x2="17" y2="18" stroke="#000" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="#000" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+          <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="#000" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+        </svg>
+      </div>
+      <div class="logo-caption">On Amber</div>
+    </div>
+  </div>
+
+  <div class="page-number">03</div>
+</div>
+
+
+<!-- ================================
+     PAGE 4 - LOGO ANATOMY
+     ================================ -->
+<div class="page page-dark">
+  <div class="section-label">02 / Logo</div>
+  <div class="section-title">Anatomy<span style="color:var(--amber)">.</span></div>
+
+  <div class="body-text" style="margin-bottom:24px;">
+    Five vertical bars, symmetric around a central axis. Each bar pair decreases in height, weight, and opacity, mimicking the intensity falloff of a real diffraction pattern.
+  </div>
+
+  <table class="spec-table" style="margin-bottom:32px;">
+    <tr><th>Bar</th><th>X Position</th><th>Y Range</th><th>Stroke Width</th><th>Opacity</th></tr>
+    <tr><td>Center</td><td class="mono">13</td><td class="mono">2–20</td><td class="mono">3.0</td><td class="mono">1.0</td></tr>
+    <tr><td>Inner L / R</td><td class="mono">9 / 17</td><td class="mono">4–18</td><td class="mono">2.0</td><td class="mono">0.6</td></tr>
+    <tr><td>Outer L / R</td><td class="mono">5.5 / 20.5</td><td class="mono">6–16</td><td class="mono">1.2</td><td class="mono">0.3</td></tr>
+  </table>
+
+  <div class="anatomy-grid">
+    <div class="anatomy-item">
+      <div class="label">Viewbox</div>
+      <div class="value">26 × 22</div>
+      <div class="detail">All bars use stroke-linecap: round</div>
+    </div>
+    <div class="anatomy-item">
+      <div class="label">Color System</div>
+      <div class="value">currentColor</div>
+      <div class="detail">Inherits from parent. Automatically adapts to dark/light mode and hover state</div>
+    </div>
+    <div class="anatomy-item">
+      <div class="label">Hover Behavior</div>
+      <div class="value">Amber + Scale</div>
+      <div class="detail">0.8s color transition to #D4883A, scale(1.08) transform</div>
+    </div>
+    <div class="anatomy-item">
+      <div class="label">Minimum Size</div>
+      <div class="value">16px wide</div>
+      <div class="detail">Below 16px, outer bars become indistinct. Prefer 22px+ for clarity.</div>
+    </div>
+  </div>
+
+  <div class="page-number">04</div>
+</div>
+
+
+<!-- ================================
+     PAGE 5 - COLOR SYSTEM (DARK)
+     ================================ -->
+<div class="page page-dark">
+  <div class="section-label">03 / Color</div>
+  <div class="section-title">Dark Mode<span style="color:var(--amber)">.</span></div>
+
+  <div class="swatch-grid">
+    <div class="swatch swatch-dark" style="background:#0a0a0a; color:#E8ECF0;">
+      <div class="swatch-name">Background</div>
+      <div class="swatch-hex">#0A0A0A</div>
+    </div>
+    <div class="swatch swatch-dark" style="background:#E8ECF0; color:#0a0a0a;">
+      <div class="swatch-name">Primary Text</div>
+      <div class="swatch-hex">#E8ECF0</div>
+    </div>
+    <div class="swatch swatch-dark" style="background:#9AA8B4; color:#0a0a0a;">
+      <div class="swatch-name">Secondary Text</div>
+      <div class="swatch-hex">#9AA8B4</div>
+    </div>
+    <div class="swatch swatch-dark" style="background:#788898; color:#fff;">
+      <div class="swatch-name">Tertiary Text</div>
+      <div class="swatch-hex">#788898</div>
+    </div>
+  </div>
+
+  <div style="font-size:10px; opacity:0.35; margin:-16px 0 20px; line-height:1.5;">CSS value is #0A0A0A. On the live site the mercury WebGL surface renders over this, producing a perceived average closer to #141413.</div>
+
+  <div class="swatch-grid">
+    <div class="swatch swatch-dark" style="background:#fff; color:#000; grid-column: span 2;">
+      <div class="swatch-name">Button Background</div>
+      <div class="swatch-hex">#FFFFFF</div>
+    </div>
+    <div class="swatch swatch-dark" style="background:#D4883A; color:#000; grid-column: span 2;">
+      <div class="swatch-name">Accent / Amber</div>
+      <div class="swatch-hex">#D4883A · rgb(212, 136, 58)</div>
+    </div>
+  </div>
+
+  <div class="section-subtitle" style="font-size:16px;">Amber Opacity Scale</div>
+  <div class="amber-scale">
+    <div class="amber-swatch" style="background:rgba(212,136,58,0.03);"><span style="color:#E8ECF0;">3%</span></div>
+    <div class="amber-swatch" style="background:rgba(212,136,58,0.08);"><span style="color:#E8ECF0;">8%</span></div>
+    <div class="amber-swatch" style="background:rgba(212,136,58,0.10);"><span style="color:#E8ECF0;">10%</span></div>
+    <div class="amber-swatch" style="background:rgba(212,136,58,0.15);"><span style="color:#E8ECF0;">15%</span></div>
+    <div class="amber-swatch" style="background:rgba(212,136,58,0.25);"><span style="color:#E8ECF0;">25%</span></div>
+    <div class="amber-swatch" style="background:rgba(212,136,58,0.35);"><span style="color:#E8ECF0;">35%</span></div>
+    <div class="amber-swatch" style="background:rgba(212,136,58,0.40);"><span style="color:#E8ECF0;">40%</span></div>
+    <div class="amber-swatch" style="background:rgba(212,136,58,1.0);"><span style="color:#000;">100%</span></div>
+  </div>
+
+  <div class="section-subtitle" style="font-size:16px;">Headline Gradient · 135°</div>
+  <div style="height:40px; border-radius:8px; background:linear-gradient(135deg, #fff 0%, #ddd 40%, #aaa 100%); margin-bottom:8px;"></div>
+  <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:9px; opacity:0.4;">
+    <span>#FFFFFF · 0%</span><span>#DDDDDD · 40%</span><span>#AAAAAA · 100%</span>
+  </div>
+
+  <div class="section-subtitle" style="font-size:16px;">Paragraph Gradient · 135°</div>
+  <div style="height:40px; border-radius:8px; background:linear-gradient(135deg, #9AA8B4 0%, #8A98A6 40%, #7A8898 100%); margin-bottom:8px;"></div>
+  <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:9px; opacity:0.4;">
+    <span>#9AA8B4 · 0%</span><span>#8A98A6 · 40%</span><span>#7A8898 · 100%</span>
+  </div>
+
+  <div class="page-number">05</div>
+</div>
+
+
+<!-- ================================
+     PAGE 6 - COLOR SYSTEM (LIGHT)
+     ================================ -->
+<div class="page page-light">
+  <div class="section-label">03 / Color</div>
+  <div class="section-title">Light Mode<span style="color:var(--amber)">.</span></div>
+
+  <div class="swatch-grid">
+    <div class="swatch swatch-light" style="background:#F8F6F3; color:#1A1A1A;">
+      <div class="swatch-name">Background</div>
+      <div class="swatch-hex">#F8F6F3</div>
+    </div>
+    <div class="swatch swatch-light" style="background:#1A1A1A; color:#F8F6F3;">
+      <div class="swatch-name">Primary Text</div>
+      <div class="swatch-hex">#1A1A1A</div>
+    </div>
+    <div class="swatch swatch-light" style="background:#5A5A5A; color:#fff;">
+      <div class="swatch-name">Secondary Text</div>
+      <div class="swatch-hex">#5A5A5A</div>
+    </div>
+    <div class="swatch swatch-light" style="background:#888; color:#fff;">
+      <div class="swatch-name">Tertiary Text</div>
+      <div class="swatch-hex">#888888</div>
+    </div>
+  </div>
+
+  <div class="swatch-grid">
+    <div class="swatch swatch-light" style="background:#1A1A1A; color:#F8F6F3; grid-column: span 2;">
+      <div class="swatch-name">Button Background</div>
+      <div class="swatch-hex">#1A1A1A</div>
+    </div>
+    <div class="swatch swatch-light" style="background:#D4883A; color:#000; grid-column: span 2;">
+      <div class="swatch-name">Accent / Amber</div>
+      <div class="swatch-hex">#D4883A · Same in both modes</div>
+    </div>
+  </div>
+
+  <div class="section-subtitle" style="font-size:16px;">Headline Gradient · 135°</div>
+  <div style="height:40px; border-radius:8px; background:linear-gradient(135deg, #1A1A1A 0%, #333 40%, #555 100%); margin-bottom:8px;"></div>
+  <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:9px; opacity:0.4;">
+    <span>#1A1A1A · 0%</span><span>#333333 · 40%</span><span>#555555 · 100%</span>
+  </div>
+
+  <div class="section-subtitle" style="font-size:16px;">Paragraph Gradient · 135°</div>
+  <div style="height:40px; border-radius:8px; background:linear-gradient(135deg, #5A5A5A 0%, #6A6A6A 40%, #7A7A7A 100%); margin-bottom:8px;"></div>
+  <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:9px; opacity:0.4;">
+    <span>#5A5A5A · 0%</span><span>#6A6A6A · 40%</span><span>#7A7A7A · 100%</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-subtitle" style="font-size:16px;">Mode-Constant Elements</div>
+  <div class="body-text">
+    The amber accent #D4883A, all amber opacity tints, animation timing, layout, typography, wave physics, and cursor orbit geometry remain identical across both modes. Only surface colors, text polarity, and shader parameters change.
+  </div>
+
+  <div class="page-number">06</div>
+</div>
+
+
+<!-- ================================
+     PAGE 7 - TYPOGRAPHY
+     ================================ -->
+<div class="page page-dark">
+  <div class="section-label">04 / Typography</div>
+  <div class="section-title">Type System<span style="color:var(--amber)">.</span></div>
+
+  <div class="type-specimen">
+    <div class="specimen-label">Display / General Sans · 700</div>
+    <div class="specimen-sample-display">Your royalties,<br>finally visible.</div>
+    <div class="specimen-meta">clamp(42px, 6vw, 72px) · -2px tracking · 1.05 line-height</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="type-specimen">
+    <div class="specimen-label">Body / Plus Jakarta Sans · 400</div>
+    <div class="specimen-sample-body">Instant verification. Transparent payouts. Built for independent artists across Africa and Latin America.</div>
+    <div class="specimen-meta">clamp(16px, 2vw, 20px) · 1.6 line-height</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="type-specimen">
+    <div class="specimen-label">Mono / JetBrains Mono · 400, 500</div>
+    <div class="specimen-sample-mono">$2.4M &nbsp; 12,400+ &nbsp; 38 &nbsp; &lt;2min</div>
+    <div class="specimen-meta">28px / 500wt for stat values · 12px / 500wt for labels</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-subtitle" style="font-size:16px;">Full Type Scale</div>
+  <table class="spec-table">
+    <tr><th>Element</th><th>Font</th><th>Size</th><th>Weight</th><th>Tracking</th></tr>
+    <tr><td>H1</td><td>General Sans</td><td class="mono">clamp(42px, 6vw, 72px)</td><td class="mono">700</td><td class="mono">-2px</td></tr>
+    <tr><td>Nav Logo</td><td>General Sans</td><td class="mono">22px</td><td class="mono">700</td><td class="mono">-0.5px</td></tr>
+    <tr><td>Body</td><td>Plus Jakarta Sans</td><td class="mono">clamp(16px, 2vw, 20px)</td><td class="mono">400</td><td class="mono">-</td></tr>
+    <tr><td>Nav Link</td><td>Plus Jakarta Sans</td><td class="mono">14px</td><td class="mono">500</td><td class="mono">-</td></tr>
+    <tr><td>Button</td><td>Plus Jakarta Sans</td><td class="mono">15px</td><td class="mono">600</td><td class="mono">-</td></tr>
+    <tr><td>Badge</td><td>Plus Jakarta Sans</td><td class="mono">12px</td><td class="mono">600</td><td class="mono">0.8px</td></tr>
+    <tr><td>Stat Value</td><td>JetBrains Mono</td><td class="mono">28px</td><td class="mono">500</td><td class="mono">-1px</td></tr>
+    <tr><td>Stat Label</td><td>Plus Jakarta Sans</td><td class="mono">12px</td><td class="mono">500</td><td class="mono">0.5px</td></tr>
+  </table>
+
+  <div class="page-number">07</div>
+</div>
+
+
+<!-- ================================
+     PAGE 8 - COMPONENTS
+     ================================ -->
+<div class="page page-dark">
+  <div class="section-label">05 / Components</div>
+  <div class="section-title">Interactive States<span style="color:var(--amber)">.</span></div>
+
+  <!-- Primary Button -->
+  <div class="section-subtitle" style="font-size:14px;">Primary Button</div>
+  <div class="component-row">
+    <div class="comp-card comp-card-dark">
+      <div class="comp-state">Default</div>
+      <div class="mock-btn-primary" style="background:#fff; color:#000;">Claim Your Royalties</div>
+    </div>
+    <div class="comp-card comp-card-dark">
+      <div class="comp-state">Hover</div>
+      <div class="mock-btn-primary" style="background:#D4883A; color:#000; box-shadow:0 4px 20px rgba(212,136,58,0.25);">Claim Your Royalties</div>
+    </div>
+    <div class="comp-card comp-card-dark">
+      <div class="comp-state">Active</div>
+      <div class="mock-btn-primary" style="background:#D4883A; color:#000; transform:scale(0.98);">Claim Your Royalties</div>
+    </div>
+  </div>
+
+  <!-- Secondary Button -->
+  <div class="section-subtitle" style="font-size:14px;">Secondary Button</div>
+  <div class="component-row">
+    <div class="comp-card comp-card-dark">
+      <div class="comp-state">Default</div>
+      <div class="mock-btn-secondary" style="background:rgba(232,236,240,0.06); color:#E8ECF0; border-color:rgba(232,236,240,0.12);">See How It Works</div>
+    </div>
+    <div class="comp-card comp-card-dark">
+      <div class="comp-state">Hover</div>
+      <div class="mock-btn-secondary" style="background:rgba(212,136,58,0.08); color:#D4883A; border-color:rgba(212,136,58,0.35);">See How It Works</div>
+    </div>
+  </div>
+
+  <!-- Badge -->
+  <div class="section-subtitle" style="font-size:14px;">Badge</div>
+  <div class="component-row">
+    <div class="comp-card comp-card-dark">
+      <div class="comp-state">Default</div>
+      <div class="mock-badge" style="background:rgba(255,255,255,0.06); color:#A0A4A8; border:1px solid rgba(255,255,255,0.12);">
+        <div class="dot" style="background:#A0A4A8;"></div>
+        NOW IN PRIVATE BETA
+      </div>
+    </div>
+    <div class="comp-card comp-card-dark">
+      <div class="comp-state">Hover</div>
+      <div class="mock-badge" style="background:rgba(212,136,58,0.10); color:#D4883A; border:1px solid rgba(212,136,58,0.35);">
+        <div class="dot" style="background:#D4883A;"></div>
+        NOW IN PRIVATE BETA
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav Link -->
+  <div class="section-subtitle" style="font-size:14px;">Nav Link</div>
+  <div class="component-row">
+    <div class="comp-card comp-card-dark">
+      <div class="comp-state">Default</div>
+      <div style="font-size:14px; font-weight:500; color:#9AA8B4; padding:4px 0;">Royalty Sniffer</div>
+    </div>
+    <div class="comp-card comp-card-dark">
+      <div class="comp-state">Hover</div>
+      <div style="font-size:14px; font-weight:500; color:#D4883A; padding:4px 0; border-bottom:1.5px solid #D4883A;">Royalty Sniffer</div>
+    </div>
+  </div>
+
+  <div class="page-number">08</div>
+</div>
+
+
+<!-- ================================
+     PAGE 9 - MOTION
+     ================================ -->
+<div class="page page-dark">
+  <div class="section-label">06 / Motion</div>
+  <div class="section-title">Animation<br>Choreography<span style="color:var(--amber)">.</span></div>
+
+  <div class="section-subtitle" style="font-size:16px;">Ignite Words Timeline</div>
+  <div class="body-text" style="margin-bottom:16px;">
+    The two key words in the headline, "royalties" and "visible", undergo a choreographed color shift from the base gradient to flat amber, followed by a traced outline flare.
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item"><div class="timeline-time">0.0s</div><div class="timeline-desc">Page loads</div></div>
+    <div class="timeline-item"><div class="timeline-time">1.0s</div><div class="timeline-desc">"royalties" color shift begins (base → amber, 2.0s)</div></div>
+    <div class="timeline-item"><div class="timeline-time">3.0s</div><div class="timeline-desc">"royalties" locks to flat amber</div></div>
+    <div class="timeline-item"><div class="timeline-time">4.5s</div><div class="timeline-desc">"visible." color shift begins (base → amber, 2.0s)</div></div>
+    <div class="timeline-item"><div class="timeline-time">6.5s</div><div class="timeline-desc">"visible." locks, both flares fire</div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-subtitle" style="font-size:16px;">Timing Scale</div>
+  <table class="spec-table">
+    <tr><th>Duration</th><th>Usage</th></tr>
+    <tr><td class="mono">0.3s</td><td>Cursor opacity fade</td></tr>
+    <tr><td class="mono">0.35s</td><td>Search input transitions (spring easing)</td></tr>
+    <tr><td class="mono">0.4s</td><td>Button background/color fade to amber</td></tr>
+    <tr><td class="mono">0.5s</td><td>Button transform, nav underline, stat transform</td></tr>
+    <tr><td class="mono">0.6s</td><td>Body/UI theme transition</td></tr>
+    <tr><td class="mono">0.8s</td><td>Logo, nav link, badge, stat color transitions</td></tr>
+    <tr><td class="mono">750ms</td><td>Hover gradient interpolation (JS easeInOut)</td></tr>
+    <tr><td class="mono">2.0s</td><td>Ignite word color shift</td></tr>
+    <tr><td class="mono">2.5s + 7.5s</td><td>Flare trace cycle (2.5s on, 7.5s off)</td></tr>
+  </table>
+
+  <div class="section-subtitle" style="font-size:16px;">Easing Functions</div>
+  <table class="spec-table">
+    <tr><th>Name</th><th>Value</th><th>Usage</th></tr>
+    <tr><td>Default</td><td class="mono">ease</td><td>Most CSS transitions</td></tr>
+    <tr><td>Spring</td><td class="mono">cubic-bezier(0.34, 1.56, 0.64, 1)</td><td>Search input</td></tr>
+    <tr><td>EaseInOut</td><td class="mono">t&lt;0.5 ? 2t² : 1-(-2t+2)²/2</td><td>JS hover gradients</td></tr>
+    <tr><td>EaseOut</td><td class="mono">1-(1-t)³</td><td>Stat counter animation</td></tr>
+  </table>
+
+  <div class="page-number">09</div>
+</div>
+
+
+<!-- ================================
+     PAGE 10 - MERCURY SURFACE
+     ================================ -->
+<div class="page page-dark">
+  <div class="section-label">07 / The Surface</div>
+  <div class="section-title">Mercury WebGL<span style="color:var(--amber)">.</span></div>
+
+  <div class="body-text" style="margin-bottom:24px;">
+    The entire background is a real-time WebGL2 wave simulation rendered as a liquid mercury surface. A 512×512 heightfield with ping-pong framebuffers drives physically-based wave propagation with ACES filmic tone mapping.
+  </div>
+
+  <div class="section-subtitle" style="font-size:16px;">Wave Physics</div>
+  <div class="param-grid">
+    <div class="param-item">
+      <div class="param-label">Wave Speed</div>
+      <div class="param-value">0.18</div>
+    </div>
+    <div class="param-item">
+      <div class="param-label">Velocity Damping</div>
+      <div class="param-value">0.945</div>
+    </div>
+    <div class="param-item">
+      <div class="param-label">Height Decay</div>
+      <div class="param-value">0.9992</div>
+    </div>
+    <div class="param-item">
+      <div class="param-label">Drop Radius</div>
+      <div class="param-value">0.015</div>
+    </div>
+    <div class="param-item">
+      <div class="param-label">Drop Strength</div>
+      <div class="param-value">0.15 + vel × 0.15</div>
+    </div>
+    <div class="param-item">
+      <div class="param-label">Ambient Interval</div>
+      <div class="param-value">~90 frames</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+    <div>
+      <div class="section-subtitle" style="font-size:16px; margin-top:0;">Dark Mode Shader</div>
+      <div class="param-grid" style="grid-template-columns:1fr;">
+        <div class="param-item"><div class="param-label">Normal Strength</div><div class="param-value">1.0</div></div>
+        <div class="param-item"><div class="param-label">Env Dark / Mid / Tint</div><div class="param-value">0.01 / 0.08 / 0.25</div></div>
+        <div class="param-item"><div class="param-label">Fresnel Range</div><div class="param-value">0.65 → 0.75</div></div>
+        <div class="param-item"><div class="param-label">Output Limiter</div><div class="param-value">0.20</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="section-subtitle" style="font-size:16px; margin-top:0;">Light Mode Shader</div>
+      <div class="param-grid" style="grid-template-columns:1fr;">
+        <div class="param-item"><div class="param-label">Normal Strength</div><div class="param-value">2.0</div></div>
+        <div class="param-item"><div class="param-label">Env Dark / Mid / Tint</div><div class="param-value">0.62 / 0.78 / 0.92</div></div>
+        <div class="param-item"><div class="param-label">Fresnel Range</div><div class="param-value">0.75 → 0.90</div></div>
+        <div class="param-item"><div class="param-label">Output Limiter</div><div class="param-value">None (ACES)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-number">10</div>
+</div>
+
+
+<!-- ================================
+     PAGE 11 - MOCKUP: DARK
+     ================================ -->
+<div class="page page-dark" style="justify-content:center;">
+  <div class="section-label">08 / Mockups</div>
+  <div class="section-title" style="margin-bottom:32px;">Dark Mode<span style="color:var(--amber)">.</span></div>
+
+  <div class="mockup-frame mockup-dark" style="flex:1; display:flex; flex-direction:column;">
+    <div class="mockup-nav">
+      <div class="mockup-nav-left">
+        <svg width="20" height="17" viewBox="0 0 26 22" fill="none">
+          <line x1="13" y1="2" x2="13" y2="20" stroke="#E8ECF0" stroke-width="3" stroke-linecap="round"/>
+          <line x1="9" y1="4" x2="9" y2="18" stroke="#E8ECF0" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="17" y1="4" x2="17" y2="18" stroke="#E8ECF0" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="#E8ECF0" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+          <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="#E8ECF0" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+        </svg>
+        <span style="font-family:'General Sans',sans-serif; font-weight:700; font-size:14px; letter-spacing:-0.3px; color:#E8ECF0;">WavCash</span>
+      </div>
+      <div class="mockup-nav-links">
+        <span class="mockup-nav-link" style="color:#9AA8B4;">Product</span>
+        <span class="mockup-nav-link" style="color:#9AA8B4;">Royalty Sniffer</span>
+        <span class="mockup-nav-link" style="color:#9AA8B4;">Splits</span>
+        <span class="mockup-nav-link" style="color:#9AA8B4;">Pricing</span>
+        <span class="mockup-nav-cta" style="background:#fff; color:#000; border-radius:6px;">Get Early Access</span>
+      </div>
+    </div>
+    <div class="mockup-hero" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <div style="margin-bottom:12px;">
+        <span class="mock-badge" style="background:rgba(255,255,255,0.06); color:#A0A4A8; border:1px solid rgba(255,255,255,0.12); font-size:8px; padding:4px 10px;">
+          <span class="dot" style="width:4px;height:4px;border-radius:50%;background:#A0A4A8;display:inline-block;"></span>
+          NOW IN PRIVATE BETA
+        </span>
+      </div>
+      <div class="mockup-hero-title" style="color:#E8ECF0;">Your <span style="color:#D4883A;">royalties,</span><br>finally <span style="color:#D4883A;">visible.</span></div>
+      <div class="mockup-hero-sub" style="color:#9AA8B4;">Instant verification. Transparent payouts.<br>Built for independent artists across Africa and Latin America.</div>
+      <div class="mockup-hero-actions">
+        <span class="btn" style="background:#fff; color:#000;">Claim Your Royalties</span>
+        <span class="btn" style="background:rgba(232,236,240,0.06); color:#E8ECF0; border:1px solid rgba(232,236,240,0.12);">See How It Works</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-number">11</div>
+</div>
+
+
+<!-- ================================
+     PAGE 12 - MOCKUP: LIGHT
+     ================================ -->
+<div class="page page-light" style="justify-content:center;">
+  <div class="section-label">08 / Mockups</div>
+  <div class="section-title" style="margin-bottom:32px;">Light Mode<span style="color:var(--amber)">.</span></div>
+
+  <div class="mockup-frame mockup-light" style="flex:1; display:flex; flex-direction:column;">
+    <div class="mockup-nav">
+      <div class="mockup-nav-left">
+        <svg width="20" height="17" viewBox="0 0 26 22" fill="none">
+          <line x1="13" y1="2" x2="13" y2="20" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
+          <line x1="9" y1="4" x2="9" y2="18" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="17" y1="4" x2="17" y2="18" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="#1A1A1A" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+          <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="#1A1A1A" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+        </svg>
+        <span style="font-family:'General Sans',sans-serif; font-weight:700; font-size:14px; letter-spacing:-0.3px; color:#1A1A1A;">WavCash</span>
+      </div>
+      <div class="mockup-nav-links">
+        <span class="mockup-nav-link" style="color:#5A5A5A;">Product</span>
+        <span class="mockup-nav-link" style="color:#5A5A5A;">Royalty Sniffer</span>
+        <span class="mockup-nav-link" style="color:#5A5A5A;">Splits</span>
+        <span class="mockup-nav-link" style="color:#5A5A5A;">Pricing</span>
+        <span class="mockup-nav-cta" style="background:#1A1A1A; color:#F8F6F3; border-radius:6px;">Get Early Access</span>
+      </div>
+    </div>
+    <div class="mockup-hero" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <div style="margin-bottom:12px;">
+        <span class="mock-badge" style="background:rgba(0,0,0,0.04); color:#777; border:1px solid rgba(0,0,0,0.10); font-size:8px; padding:4px 10px;">
+          <span class="dot" style="width:4px;height:4px;border-radius:50%;background:#777;display:inline-block;"></span>
+          NOW IN PRIVATE BETA
+        </span>
+      </div>
+      <div class="mockup-hero-title" style="color:#1A1A1A;">Your <span style="color:#D4883A;">royalties,</span><br>finally <span style="color:#D4883A;">visible.</span></div>
+      <div class="mockup-hero-sub" style="color:#5A5A5A;">Instant verification. Transparent payouts.<br>Built for independent artists across Africa and Latin America.</div>
+      <div class="mockup-hero-actions">
+        <span class="btn" style="background:#1A1A1A; color:#F8F6F3;">Claim Your Royalties</span>
+        <span class="btn" style="background:rgba(0,0,0,0.04); color:#1A1A1A; border:1px solid rgba(0,0,0,0.10);">See How It Works</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-number">12</div>
+</div>
+
+
+<!-- ================================
+     PAGE 13 - CURSOR & EFFECTS
+     ================================ -->
+<div class="page page-dark">
+  <div class="section-label">09 / Effects</div>
+  <div class="section-title">Cursor &amp; Flare<span style="color:var(--amber)">.</span></div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px;">
+    <div>
+      <div class="section-subtitle" style="font-size:16px; margin-top:0;">Atom Cursor</div>
+      <div class="body-text" style="max-width:none; margin-bottom:16px;">
+        A custom SVG cursor: three elliptical orbits with electrons tracing continuous paths. Follows the mouse with a 0.25 lag factor, creating a fluid, deliberate feel.
+      </div>
+      <table class="spec-table">
+        <tr><th>Property</th><th>Value</th></tr>
+        <tr><td>Viewbox</td><td class="mono">36 × 36</td></tr>
+        <tr><td>Orbits</td><td class="mono">3 ellipses · rx:14 ry:5</td></tr>
+        <tr><td>Tilt angles</td><td class="mono">0° / 60° / 120°</td></tr>
+        <tr><td>Electron radius</td><td class="mono">1.8</td></tr>
+        <tr><td>Speeds</td><td class="mono">1.8 / 2.3 / 1.5 rad/s</td></tr>
+        <tr><td>Dark color</td><td class="mono" style="color:#D4883A;">#D4883A</td></tr>
+        <tr><td>Light color</td><td class="mono">#1A1A1A</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="section-subtitle" style="font-size:16px; margin-top:0;">Outline Flare</div>
+      <div class="body-text" style="max-width:none; margin-bottom:16px;">
+        An Apple-inspired traced outline that sweeps around the ignited words. SVG text element with stroke-dasharray animation, gaussian blur glow, and choreographed fade.
+      </div>
+      <table class="spec-table">
+        <tr><th>Property</th><th>Value</th></tr>
+        <tr><td>Stroke width</td><td class="mono">0.8</td></tr>
+        <tr><td>Lit segment</td><td class="mono">8% of path length</td></tr>
+        <tr><td>Trace duration</td><td class="mono">2.5s</td></tr>
+        <tr><td>Rest duration</td><td class="mono">7.5s</td></tr>
+        <tr><td>Blur</td><td class="mono">stdDeviation: 3</td></tr>
+        <tr><td>Dark color</td><td class="mono">#FFFFFF</td></tr>
+        <tr><td>Light color</td><td class="mono">#F8F6F3</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-subtitle" style="font-size:16px;">Shadows &amp; Transforms</div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+    <div>
+      <table class="spec-table">
+        <tr><th>Element</th><th>Shadow</th></tr>
+        <tr><td>Button default</td><td class="mono">0 2px 8px · 10% α</td></tr>
+        <tr><td>Button hover</td><td class="mono">0 4px 20px amber 25%</td></tr>
+        <tr><td>Search focus</td><td class="mono">0 0 0 3px amber 10%</td></tr>
+      </table>
+    </div>
+    <div>
+      <table class="spec-table">
+        <tr><th>Element</th><th>Transform</th></tr>
+        <tr><td>Button hover</td><td class="mono">translateY(-1px)</td></tr>
+        <tr><td>Stat hover</td><td class="mono">translateY(-3px)</td></tr>
+        <tr><td>Button active</td><td class="mono">scale(0.98)</td></tr>
+        <tr><td>Logo hover</td><td class="mono">scale(1.08)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="page-number">13</div>
+</div>
+
+
+<!-- ================================
+     PAGE 14 - BACK COVER
+     ================================ -->
+<div class="page page-black" style="justify-content:center; align-items:center; text-align:center;">
+  <div style="margin-bottom:48px;">
+    <svg width="52" height="44" viewBox="0 0 26 22" fill="none">
+      <line x1="13" y1="2" x2="13" y2="20" stroke="#D4883A" stroke-width="3" stroke-linecap="round"/>
+      <line x1="9" y1="4" x2="9" y2="18" stroke="#D4883A" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="17" y1="4" x2="17" y2="18" stroke="#D4883A" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="#D4883A" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+      <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="#D4883A" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+    </svg>
+  </div>
+  <div style="font-family:'General Sans',sans-serif; font-size:32px; font-weight:700; letter-spacing:-1.5px; margin-bottom:8px;">WavCash</div>
+  <div style="font-size:14px; opacity:0.3; margin-bottom:64px;">Your royalties, finally visible.</div>
+  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; opacity:0.15;">wav.cash · 2026</div>
+</div>
+
+
+</body>
+</html>

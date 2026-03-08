@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WavCash White Paper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=General+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ---- THEME CUSTOM PROPERTIES ---- */
+  :root {
+    --bg-body: #0a0a0a;
+    --text-primary: #E8ECF0;
+    --text-secondary: #9AA8B4;
+    --text-tertiary: #788898;
+    --accent: #D4883A;
+    --bg-surface: rgba(232,236,240,0.06);
+    --border-subtle: rgba(232,236,240,0.12);
+    --bg-badge: rgba(255,255,255,0.06);
+    --border-badge: rgba(255,255,255,0.12);
+  }
+  html.light-mode {
+    --bg-body: #F8F6F3;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5A5A5A;
+    --text-tertiary: #888;
+    --bg-surface: rgba(0,0,0,0.04);
+    --border-subtle: rgba(0,0,0,0.10);
+    --bg-badge: rgba(0,0,0,0.04);
+    --border-badge: rgba(0,0,0,0.10);
+  }
+
+  /* ---- RESET & BASE ---- */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: var(--bg-body);
+    color: var(--text-primary);
+    transition: background 0.6s ease, color 0.6s ease;
+    line-height: 1.7;
+  }
+
+  /* ---- TYPOGRAPHY ---- */
+  .font-display { font-family: 'General Sans', sans-serif; }
+  .font-body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ---- TOP NAV ---- */
+  .top-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 40px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: background 0.6s ease, border-color 0.6s ease;
+  }
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text-primary);
+  }
+  .nav-logo-text {
+    font-family: 'General Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .nav-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border-subtle);
+  }
+  .nav-doc-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 7px 9px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.5s ease;
+    font-size: 14px;
+  }
+  .theme-toggle:hover {
+    color: var(--accent);
+    border-color: rgba(212,136,58,0.35);
+    background: rgba(212,136,58,0.08);
+  }
+  .icon-sun { display: block; }
+  .icon-moon { display: none; }
+  html.light-mode .icon-sun { display: none; }
+  html.light-mode .icon-moon { display: block; }
+
+  /* ---- SIDEBAR TOC ---- */
+  .sidebar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 260px;
+    height: calc(100vh - 60px);
+    padding: 32px 24px;
+    overflow-y: auto;
+    z-index: 50;
+    transition: transform 0.35s ease;
+  }
+  .sidebar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+    margin-bottom: 16px;
+  }
+  .toc-list {
+    list-style: none;
+  }
+  .toc-item {
+    margin-bottom: 2px;
+  }
+  .toc-link {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text-tertiary);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    line-height: 1.4;
+  }
+  .toc-link:hover {
+    color: var(--text-secondary);
+    background: var(--bg-surface);
+  }
+  .toc-link.active {
+    color: var(--accent);
+    background: rgba(212,136,58,0.06);
+  }
+  .toc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    opacity: 0.5;
+    min-width: 14px;
+  }
+
+  /* ---- MOBILE SIDEBAR TOGGLE ---- */
+  .sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 70px;
+    left: 16px;
+    z-index: 60;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    font-size: 16px;
+  }
+
+  /* ---- MAIN CONTENT ---- */
+  .main {
+    margin-left: 260px;
+    padding: 0 40px;
+    max-width: 1060px;
+  }
+  .content {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  /* ---- COVER SECTION ---- */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 60px;
+  }
+  .cover-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+    margin-bottom: 24px;
+  }
+  .cover-title {
+    font-family: 'General Sans', sans-serif;
+    font-size: clamp(42px, 6vw, 64px);
+    font-weight: 700;
+    letter-spacing: -2.5px;
+    line-height: 1.05;
+    margin-bottom: 20px;
+  }
+  .cover-subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 560px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    opacity: 0.35;
+  }
+  .scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-tertiary);
+    opacity: 0.3;
+  }
+  .scroll-indicator span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .scroll-arrow {
+    width: 16px;
+    height: 16px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  /* ---- SECTION BLOCKS ---- */
+  .wp-section {
+    padding: 56px 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-family: 'General Sans', sans-serif;
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    line-height: 1.15;
+    margin-bottom: 32px;
+  }
+  .section-subtitle {
+    font-family: 'General Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+    margin-top: 40px;
+  }
+  .section-subtitle:first-of-type { margin-top: 0; }
+
+  /* ---- BODY TEXT ---- */
+  .body-text {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+  }
+  .body-text:last-child { margin-bottom: 0; }
+
+  /* ---- CASE STUDY CARDS ---- */
+  .case-study {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 24px 0;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .case-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .case-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+
+  /* ---- PULL QUOTES ---- */
+  .pull-quote {
+    font-family: 'General Sans', sans-serif;
+    font-size: clamp(18px, 2.5vw, 24px);
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    line-height: 1.45;
+    color: var(--text-primary);
+    padding: 32px 0;
+    margin: 24px 0;
+    border-top: 2px solid var(--accent);
+    border-bottom: 1px solid var(--border-subtle);
+    position: relative;
+  }
+
+  /* ---- DATA TABLES ---- */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 24px 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 500px;
+  }
+  .spec-table th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+  }
+  .spec-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(232,236,240,0.04);
+    vertical-align: top;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  html.light-mode .spec-table td {
+    border-bottom-color: rgba(0,0,0,0.04);
+  }
+  .spec-table .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .spec-table .amber {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ---- CODE BLOCKS ---- */
+  .code-block {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    overflow-x: auto;
+    color: var(--text-secondary);
+  }
+
+  /* ---- TIMELINE ---- */
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+    margin: 24px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: var(--border-subtle);
+  }
+  .timeline-item {
+    position: relative;
+    padding: 12px 0;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -23px;
+    top: 18px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .timeline-phase {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .timeline-focus {
+    font-family: 'General Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .timeline-desc {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    line-height: 1.6;
+  }
+
+  /* ---- STAT DATA BLOCK ---- */
+  .stat-block {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 12px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    flex: 1;
+  }
+  .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* ---- SOURCE FOOTNOTES ---- */
+  .source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+    margin-top: 16px;
+  }
+
+  /* ---- DIVIDER ---- */
+  .divider {
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 0;
+  }
+
+  /* ---- FOOTER ---- */
+  .wp-footer {
+    padding: 80px 0 60px;
+    text-align: center;
+  }
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .footer-logo-text {
+    font-family: 'General Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .footer-tagline {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+  .footer-url {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 1024px) {
+    .sidebar { display: none; }
+    .sidebar.open { display: block; transform: translateX(0); background: var(--bg-body); width: 260px; border-right: 1px solid var(--border-subtle); }
+    .sidebar-toggle { display: block; }
+    .main { margin-left: 0; }
+  }
+  @media (max-width: 768px) {
+    .top-nav { padding: 12px 20px; }
+    .main { padding: 0 20px; }
+    .cover-title { letter-spacing: -1.5px; }
+    .cover-meta { flex-direction: column; gap: 8px; }
+    .section-title { margin-bottom: 24px; }
+    .spec-table { font-size: 12px; }
+  }
+
+  /* ---- PRINT ---- */
+  @media print {
+    @page { size: A4; margin: 48px 56px; }
+    body { background: #fff; color: #1A1A1A; }
+    .top-nav, .sidebar, .sidebar-toggle, .theme-toggle, .scroll-indicator { display: none !important; }
+    .main { margin-left: 0; padding: 0; max-width: none; }
+    .content { max-width: none; }
+    .cover { min-height: auto; padding-top: 120px; padding-bottom: 80px; page-break-after: always; }
+    .wp-section { page-break-inside: avoid; }
+    .case-study, .code-block, .table-wrap { page-break-inside: avoid; }
+    .spec-table td, .body-text, .case-text { color: #333; }
+    .section-label, .toc-num, .cover-badge, .cover-meta { color: #888; }
+    .bg-surface, .case-study, .code-block, .stat-block { backdrop-filter: none; -webkit-backdrop-filter: none; background: #f5f5f5; }
+    .spec-table th { color: #666; border-bottom-color: #ddd; }
+    .spec-table td { border-bottom-color: #eee; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="#" class="nav-logo">
+      <svg width="22" height="18" viewBox="0 0 26 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+        <line x1="9" y1="4" x2="9" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+        <line x1="13" y1="2" x2="13" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <line x1="17" y1="4" x2="17" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+        <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+      </svg>
+      <span class="nav-logo-text">WavCash</span>
+    </a>
+    <div class="nav-divider"></div>
+    <span class="nav-doc-title">White Paper</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+    <span class="icon-sun">&#9788;</span>
+    <span class="icon-moon">&#9790;</span>
+  </button>
+</nav>
+
+<!-- MOBILE SIDEBAR TOGGLE -->
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+
+<!-- SIDEBAR TOC -->
+<aside class="sidebar">
+  <div class="sidebar-title">Contents</div>
+  <ul class="toc-list">
+    <li class="toc-item"><a href="#executive-summary" class="toc-link active"><span class="toc-num"></span> Executive Summary</a></li>
+    <li class="toc-item"><a href="#the-problem" class="toc-link"><span class="toc-num">01</span> The Problem</a></li>
+    <li class="toc-item"><a href="#the-market" class="toc-link"><span class="toc-num">02</span> The Market</a></li>
+    <li class="toc-item"><a href="#the-solution" class="toc-link"><span class="toc-num">03</span> The Solution</a></li>
+    <li class="toc-item"><a href="#phase-2" class="toc-link"><span class="toc-num">04</span> Phase 2 and Beyond</a></li>
+    <li class="toc-item"><a href="#technical" class="toc-link"><span class="toc-num">05</span> Technical Architecture</a></li>
+    <li class="toc-item"><a href="#business-model" class="toc-link"><span class="toc-num">06</span> Business Model</a></li>
+    <li class="toc-item"><a href="#go-to-market" class="toc-link"><span class="toc-num">07</span> Go-to-Market</a></li>
+    <li class="toc-item"><a href="#conclusion" class="toc-link"><span class="toc-num"></span> Conclusion</a></li>
+  </ul>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+<div class="content">
+
+<!-- COVER -->
+<section class="cover" id="cover">
+  <div style="margin-bottom:24px;">
+    <svg width="48" height="38" viewBox="0 0 26 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+      <line x1="9" y1="4" x2="9" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="13" y1="2" x2="13" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <line x1="17" y1="4" x2="17" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+    </svg>
+  </div>
+  <h1 class="cover-title">WavCash<br>White Paper</h1>
+  <p class="cover-subtitle">Royalty intelligence and payment infrastructure for music rights holders in Africa and Latin America.</p>
+  <div class="cover-meta">
+    <span>wav.cash</span>
+    <span>February 2026</span>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- EXECUTIVE SUMMARY -->
+<section class="wp-section" id="executive-summary">
+  <div class="section-label">Executive Summary</div>
+  <h2 class="section-title">The gap between what the fastest-growing music markets earn and what their rights holders receive</h2>
+
+  <p class="body-text">Music rights holders in Africa and Latin America are operating blind. Streaming revenues in these regions grew 22.5 to 22.6 percent in 2024, among the fastest rates anywhere in the world. The infrastructure built to track, verify, and distribute the money those streams generate was designed for different markets, different eras, and different rights holders. The result is a structural gap between what the fastest-growing music markets earn and what their rights holders actually receive.</p>
+
+  <p class="body-text">WavCash is royalty intelligence and payment infrastructure built to close that gap. It aggregates streaming data across every major DSP, calculates what rights holders are owed using tamper-proof verified data, surfaces the difference between expected and actual payouts, guides registration with Collective Management Organizations, and in Phase 2 settles instantly to local currency via M-Pesa, PIX, Paystack, bank transfer, or USDC.</p>
+
+  <p class="body-text">The platform serves all music rights holders: artists, producers, songwriters, session musicians, publishers, and anyone else with a legal stake in a musical work. Independent artists are the primary acquisition channel and the face of the product. Every feature is built for the broader rights holder ecosystem, and the Enterprise tier is designed for labels, managers, and publishers handling multiple catalogs.</p>
+</section>
+
+<!-- PART 1: THE PROBLEM -->
+<section class="wp-section" id="the-problem">
+  <div class="section-label">Part 1</div>
+  <h2 class="section-title">The Problem</h2>
+
+  <h3 class="section-subtitle">Fragmentation by Design</h3>
+  <p class="body-text">A rights holder in Lagos, Nairobi, or Sao Paulo today earns royalties from multiple sources that have nothing to do with each other. Their distributor pays master recording royalties on a monthly or quarterly schedule. Their Collective Management Organization may or may not have their registration on file, and if it does, pays out every six to twelve months after significant administrative delay. YouTube Content ID earnings operate on a separate schedule. Sync licensing deals pay whenever a placement closes.</p>
+  <p class="body-text">Each income stream has its own portal, its own statement format, and its own currency conversion. A rights holder managing even a small catalog across two distributors and one CMO is navigating at minimum three separate dashboards with no unified view of their total earnings.</p>
+
+  <div class="pull-quote">Rights holders do not know what they are owed. They know what they were paid, and only after the fact.</div>
+
+  <h3 class="section-subtitle">The Verification Problem</h3>
+  <p class="body-text">Even when rights holders receive payment, they have no reliable way to verify whether the amount is accurate. These are not isolated incidents. They are symptoms of infrastructure that was not built for the rights holders it purports to serve.</p>
+
+  <div class="case-study">
+    <div class="case-label">Kenya, 2024</div>
+    <p class="case-text">Artist Bien-Aime Baraza publicly refused to collect a royalty check for $11.61 from the Music Copyright Society of Kenya after accumulating millions of streams. MCSK issued it according to their distribution methodology. With no independent calculation to compare against, artists have no way to know whether they are being paid correctly.</p>
+  </div>
+
+  <div class="case-study">
+    <div class="case-label">Nigeria, January 2026</div>
+    <p class="case-text">The Nigerian Copyright Commission attempted to distribute over one billion naira in private copy levies. Major labels objected publicly. The International Federation of the Phonographic Industry wrote to the Commission warning of irreversible prejudice to rights holders. The money remains undistributed.</p>
+  </div>
+
+  <div class="case-study">
+    <div class="case-label">South Africa</div>
+    <p class="case-text">SAMRO unlocked R22 million in unclaimed royalties simply by updating bank account records. That money had been sitting in the system, uncollected, because rights holders did not know it existed.</p>
+  </div>
+
+  <h3 class="section-subtitle">The Registration Gap</h3>
+  <p class="body-text">A significant share of royalties go uncollected in Africa and Latin America because rights holders have never registered their works with the relevant CMOs. In Nigeria, publishing activity accounts for a small fraction of total music industry revenue precisely because rights holders are not registered with organizations like MCSN or COSON. The registration process itself is a barrier. Each CMO has different requirements, different forms, different documentation, and different submission channels. For a producer in Lagos managing multiple tracks across multiple artists, navigating six different CMO processes in four different countries is prohibitive.</p>
+
+  <h3 class="section-subtitle">The Settlement Problem</h3>
+  <p class="body-text">Even when royalties are collected and verified, the last mile fails. Converting USD or EUR royalties to Nigerian naira, Kenyan shillings, or Brazilian reais through traditional banking infrastructure involves three to five percent in conversion costs and processing times measured in days or weeks. For rights holders who depend on royalty income to fund their next project, a two-to-six month payment cycle followed by a slow and expensive conversion is not a financial system. It is a friction machine.</p>
+  <p class="body-text">The payment infrastructure to solve this problem already exists. PIX covers 175 million users across Brazil and processes transactions in seconds. M-Pesa serves over 34 million active users in Kenya alone. Paystack handles approximately 20 percent of all online transactions in Nigeria. For rights holders who prefer to hold or transact in stablecoins, USDC settlement on AVAX C-Chain is also available. What is missing is the collection and intelligence layer that connects royalty income to these payment systems.</p>
+</section>
+
+<!-- PART 2: THE MARKET -->
+<section class="wp-section" id="the-market">
+  <div class="section-label">Part 2</div>
+  <h2 class="section-title">The Market</h2>
+
+  <h3 class="section-subtitle">Global Context</h3>
+  <p class="body-text">Global recorded music revenues reached $29.6 billion in 2024, growing 4.8 percent year over year according to IFPI's Global Music Report 2025. Streaming accounted for 69 percent of total revenues, exceeding $20 billion for the first time. Paid subscription accounts grew 10.6 percent to 752 million globally. The growth is not evenly distributed. The fastest-growing regions are precisely those where WavCash operates.</p>
+
+  <h3 class="section-subtitle">Sub-Saharan Africa</h3>
+  <p class="body-text">Sub-Saharan Africa grew 22.6 percent in 2024, surpassing $100 million in recorded music revenue for the first time ($110 million). South Africa accounts for 75 percent of regional revenues and grew 14.4 percent. Nigeria is the second-largest market and one of the fastest growing on a percentage basis in local currency terms. CISAC reports that African CMO collections represent less than one percent of global songwriter royalty collections despite the continent's growing share of global streaming consumption. The infrastructure gap is quantifiable.</p>
+
+  <h3 class="section-subtitle">Latin America</h3>
+  <p class="body-text">Latin America grew 22.5 percent in 2024, its fifteenth consecutive year of growth. Brazil, the region's largest market, grew 21.7 percent, making it the fastest-growing top ten global market. Mexico grew 15.6 percent and entered the global top ten for the first time, displacing Australia. Streaming accounts for 87.8 percent of total Latin American recorded music revenues. The audience is already digital. What the region lacks is the royalty intelligence infrastructure to connect streaming activity to verified earnings and instant settlement.</p>
+
+  <h3 class="section-subtitle">Rights Holder Universe</h3>
+  <p class="body-text">WavCash's addressable market is not limited to artists. Any individual or entity with a legal stake in a musical work is a potential user.</p>
+
+  <div class="table-wrap">
+    <table class="spec-table">
+      <thead>
+        <tr><th>Market</th><th>Est. Rights Holders</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Brazil (ECAD system)</td><td class="mono">323,000</td></tr>
+        <tr><td>Argentina and rest of LATAM</td><td class="mono">140,000 estimated</td></tr>
+        <tr><td>Nigeria and Kenya</td><td class="mono">40,000 registered</td></tr>
+        <tr><td>Rest of Africa</td><td class="mono">30,000 to 50,000</td></tr>
+        <tr><td>South Africa (SAMRO, CAPASSO, SAMPRA)</td><td class="mono">20,000 to 25,000</td></tr>
+        <tr><td style="font-weight:600;">Total estimated</td><td class="mono" style="font-weight:600;">550,000 to 580,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="body-text">This figure understates the true addressable market because it counts only those already engaged with formal collection systems. The informal economy of producers, session musicians, engineers, and artists who have never registered with any CMO is significantly larger.</p>
+  <p class="source">Sources: IFPI Global Music Report 2025, CISAC Global Collections Report 2025, ECAD 2023 Annual Report</p>
+</section>
+
+<!-- PART 3: THE SOLUTION -->
+<section class="wp-section" id="the-solution">
+  <div class="section-label">Part 3</div>
+  <h2 class="section-title">The Solution</h2>
+
+  <h3 class="section-subtitle">Royalty Intelligence, Not Royalty Accounting</h3>
+  <p class="body-text">The fundamental insight behind WavCash is the difference between intelligence and accounting. Accounting tells you what arrived. Intelligence tells you what should have arrived. Existing tools in the market handle accounting. WavCash leads with intelligence.</p>
+  <p class="body-text">The oracle layer sits at the center of the product. It fetches stream counts from every major DSP using track ISRCs, applies published per-stream rates verified independently through Chainlink data feeds, and calculates estimated royalties in real time. Rights holders see what they should be earning before any payment arrives. When payments do arrive, via CSV upload at MVP and automatic sync in Phase 3, the platform compares actuals against oracle estimates and flags discrepancies.</p>
+
+  <div class="pull-quote">The question WavCash answers is not "how much did I get paid?" It is "how much should I be owed, and is what I received consistent with that?"</div>
+
+  <h3 class="section-subtitle">Data Architecture and Trust</h3>
+  <p class="body-text">The royalty oracle pipeline runs offchain for cost efficiency. Stream count data is fetched via DSP APIs through a daily batch job and stored in a managed database. Per-stream rates are sourced from independently verified onchain data feeds and stored in a rates registry on AVAX C-Chain.</p>
+  <p class="body-text">WavCash uses a hybrid approach: the pipeline itself runs offchain, while trust is enforced through a daily onchain attestation. Once per day, after the full data snapshot is complete, WavCash writes a single cryptographic merkle root of the entire dataset to AVAX C-Chain. If any number in the underlying data were altered, the hash would not match the onchain record. Tampering is detectable and the verification is permanently and publicly auditable.</p>
+  <p class="body-text">The Chainlink layer is abstracted entirely from users. Rights holders interact with "Verified" badges and clean dashboard data. The technical infrastructure is invisible. The user-facing claim is simple: your royalty data is permanently recorded and no one can alter your historical earnings.</p>
+
+  <h3 class="section-subtitle">Splits by WavCash</h3>
+  <p class="body-text">Every song has multiple contributors. Producers, co-writers, featured artists, session musicians, and engineers all have legitimate claims on a track's earnings. In practice, these arrangements are governed by verbal agreements, WhatsApp messages, and informal trust. When money arrives, disputes arise. Splits by WavCash creates legally binding, onchain co-ownership records before any money arrives.</p>
+  <p class="body-text">When a track is finished, the rights holder creates a Split agreement: adding each contributor by email with legal name required, or by WavCash ID, a unique platform identifier that auto-populates contributor details. Each contributor is assigned a role and a percentage. The agreement is sent for signatures. An agreement does not become Active until all contributors have signed.</p>
+  <p class="body-text">At MVP, a Split is a permanent legal and onchain record. It establishes who owns what. When royalties arrive for that track, distribution to contributors happens manually or through the creator's own arrangements.</p>
+  <p class="body-text">In Phase 2, when virtual account infrastructure activates, automatic redistribution turns on. When royalties arrive for a registered ISRC, WavCash detects the incoming payment, checks whether an active Split agreement exists, and automatically distributes each contributor's share to their preferred settlement method: local currency, or USDC. The creating rights holder forwards nothing manually. The contract executes.</p>
+  <p class="body-text">The key architectural fact is that distributors pay the full royalty amount to whoever registered the track. The distributor has no knowledge of private split arrangements. WavCash operates as the redistribution layer between the distributor payout and the individual contributors. This is why the virtual account infrastructure in Phase 2 is essential: WavCash must receive the full amount in order to redistribute it.</p>
+
+  <h3 class="section-subtitle">Reclaim: CMO Registration Guide</h3>
+  <p class="body-text">Reclaim is a guided registration tool that helps rights holders navigate CMO registration in their territory. WavCash prepares the complete submission package: pre-filled forms using catalog data and profile data already stored in the system. Rights holders review the package, upload required documents, and receive step-by-step instructions for submitting through the CMO's own channel.</p>
+  <p class="body-text">WavCash does not submit to CMOs directly at MVP. CMOs do not have public submission APIs and registration happens through portals, email, or physical mail. WavCash prepares. The rights holder submits. Status tracking and reminder emails keep the process moving.</p>
+  <p class="body-text">Reclaim covers UBC (Nigeria), MCSK (Kenya), SAMRO and CAPASSO (South Africa), ECAD (Brazil), and SACM (Mexico) at MVP. Each registration wizard includes a per-track payout toggle, default on, that configures routing of distributor royalties through WavCash for instant local settlement or USDC. This toggle is configurable at MVP and activates operationally in Phase 2.</p>
+
+  <h3 class="section-subtitle">Enterprise Multi-Seat Dashboard</h3>
+  <p class="body-text">Enterprise accounts serve any rights holder or organization managing three or more artists or works: managers, small labels, independent publishers, and collective groups. Enterprise is not limited to traditional label structures.</p>
+  <p class="body-text">At MVP, Enterprise provides consolidated roster visibility: total earnings across all artists, Reclaim status per artist per CMO, active Splits across the roster, and team seat management. In Phase 2, Enterprise adds the full label tooling suite: bulk payout management, white-label royalty statements, automatic split redistribution across the roster, and onboarding of artists on the label's behalf. Enterprise customers arriving at the moment payment rails activate bring their entire roster into the payout infrastructure from day one, generating immediate transaction volume.</p>
+</section>
+
+<!-- PART 4: PHASE 2 AND BEYOND -->
+<section class="wp-section" id="phase-2">
+  <div class="section-label">Part 4</div>
+  <h2 class="section-title">Phase 2 and Beyond</h2>
+
+  <h3 class="section-subtitle">Virtual Account Infrastructure</h3>
+  <p class="body-text">Phase 2 activates the payment layer through virtual account infrastructure issued in rights holders' names by market-specific BaaS partners.</p>
+
+  <div class="table-wrap">
+    <table class="spec-table">
+      <thead>
+        <tr><th>Market</th><th>BaaS Partner</th><th>Account Type</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Nigeria</td><td>Fincra or Paystack DVA</td><td class="mono">Named NUBAN account</td></tr>
+        <tr><td>Brazil</td><td>Dock + PIX</td><td class="mono">Tied to artist's CPF</td></tr>
+        <tr><td>Mexico</td><td>Conekta or Dock</td><td class="mono">CLABE tied to RFC and CURP</td></tr>
+        <tr><td>South Africa</td><td>Ukheshe or FinSwitch</td><td class="mono">EFT-compatible, pending</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="body-text">Each WavCash account receives a dedicated virtual account in the rights holder's name. The account details are never surfaced in the product UI. The account simply receives royalties.</p>
+  <p class="body-text">When a distributor pays royalties into this account, WavCash detects the incoming payment, identifies the ISRC, checks for active Split agreements, and routes to the rights holder's preferred settlement method: M-Pesa, PIX, Paystack, bank transfer, or USDC.e on AVAX C-Chain. Rights holders who prefer stablecoin settlement get the same instant clearance without any FX conversion cost.</p>
+
+  <h3 class="section-subtitle">Fee Structure</h3>
+  <div class="table-wrap">
+    <table class="spec-table">
+      <thead>
+        <tr><th>Route</th><th>Fee</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Distributor royalties &rarr; local currency</td><td class="mono">0.5% tx fee + 2% FX spread</td></tr>
+        <tr><td>Distributor royalties &rarr; USDC.e</td><td class="mono">0.5% tx fee only</td></tr>
+        <tr><td>CMO royalties (named virtual account)</td><td class="mono">9.5% commission + 0.5% processing</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="body-text">Phase 2 turns on two transaction revenue streams simultaneously from one infrastructure buildout. Kenya's virtual account infrastructure is a Phase 3 item pending identification of a viable local banking partner for named account issuance.</p>
+
+  <h3 class="section-subtitle">Product Roadmap</h3>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-phase">MVP</div>
+      <div class="timeline-focus">Royalty Intelligence</div>
+      <div class="timeline-desc">Oracle dashboard, Royalty Sniffer, Reclaim guide, onchain Splits, Enterprise roster</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 2</div>
+      <div class="timeline-focus">Payments + Enterprise Tools</div>
+      <div class="timeline-desc">Virtual accounts (Nigeria, Brazil, Mexico, South Africa), distributor payout rail, CMO payout rail, full Enterprise suite, local currency and USDC settlement</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 3</div>
+      <div class="timeline-focus">Distribution Intelligence</div>
+      <div class="timeline-desc">Distributor OAuth, Kenya rail, Ghana activation, earnings forecasting, catalog health score</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 4</div>
+      <div class="timeline-focus">Territory Expansion</div>
+      <div class="timeline-desc">Colombia, Argentina, Tanzania</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 5</div>
+      <div class="timeline-focus">Financial Products</div>
+      <div class="timeline-desc">Royalty advances, WavCash card, earnings-linked savings, float yield</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 6</div>
+      <div class="timeline-focus">Data and Ecosystem</div>
+      <div class="timeline-desc">Anonymized market intelligence, WavCash API, track licensing marketplace with onchain agreements and settlements for beat licensing</div>
+    </div>
+  </div>
+</section>
+
+<!-- PART 5: TECHNICAL ARCHITECTURE -->
+<section class="wp-section" id="technical">
+  <div class="section-label">Part 5</div>
+  <h2 class="section-title">Technical Architecture</h2>
+
+  <h3 class="section-subtitle">Stack</h3>
+  <div class="table-wrap">
+    <table class="spec-table">
+      <thead>
+        <tr><th>Layer</th><th>Technology</th><th>Rationale</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Frontend</td><td class="mono">Next.js 14 + TypeScript</td><td>SSR, API routes, Vercel deployment</td></tr>
+        <tr><td>Database + Auth</td><td class="mono">Supabase (PostgreSQL + Auth + Vault)</td><td>Managed DB, RLS, encrypted key storage. No server management.</td></tr>
+        <tr><td>Blockchain</td><td class="mono">AVAX C-Chain (EVM)</td><td>Solidity contracts, low fees, EVM tooling (Hardhat, ethers.js)</td></tr>
+        <tr><td>Wallet (custodial)</td><td class="mono">ethers.js + Supabase Vault</td><td>Silent wallet creation at signup. Keys KMS-backed.</td></tr>
+        <tr><td>Oracle pipeline</td><td class="mono">Supabase Edge Functions (cron)</td><td>Daily stream count fetch. Offchain for cost efficiency.</td></tr>
+        <tr><td>Rate verification</td><td class="mono">Chainlink Data Feeds via AVAX C-Chain</td><td>Per-stream rates independently verified. Updated quarterly.</td></tr>
+        <tr><td>Attestation</td><td class="mono">AVAX C-Chain (daily merkle root)</td><td>One transaction per day covers all data. ~$0.001/day.</td></tr>
+        <tr><td>Email</td><td class="mono">Resend</td><td>Transactional email: signing invites, status updates, alerts</td></tr>
+        <tr><td>Deployment</td><td class="mono">Vercel</td><td>Automatic deploys from Git</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="section-subtitle">Oracle Architecture</h3>
+  <p class="body-text">WavCash uses a hybrid offchain and onchain approach. Stream count data is fetched from DSP APIs via a daily offchain cron job and stored in a managed database. Per-stream rates are sourced from Chainlink Data Feeds and stored onchain in a rates registry on AVAX C-Chain, ensuring that the rate inputs are independently verifiable and not controlled by WavCash. Once per day, a single cryptographic merkle root of the entire dataset is written to AVAX C-Chain in one transaction, creating a tamper-proof permanent record for every rights holder, every track, and every DSP.</p>
+
+  <h3 class="section-subtitle">Onchain Contracts</h3>
+  <div class="code-block">DataAttestation.sol    Receives daily merkle root writes. Stores timestamp,
+                       root hash, snapshot ID. Public verification function.
+
+RatesRegistry.sol      Stores per-stream rates fed by Chainlink. Quarterly
+                       updates. Authoritative rate source for oracle.
+
+SplitFactory.sol       Deploys individual Split contracts. Maintains registry
+                       of all agreements.
+
+Split.sol              Per-agreement contract. ISRC, contributor addresses,
+                       share allocations, status enum.
+                       Functions: sign(), amend(), void().</div>
+
+  <h3 class="section-subtitle">Crypto Abstraction Principle</h3>
+  <p class="body-text">The entire onchain layer is invisible to users by default. Wallet creation at signup is silent. Split agreements surface as "Agreement Active," not contract addresses. Data attestation surfaces as "Verified," not transaction hashes. Onchain details are available only in an optional Verification view the user must explicitly navigate to.</p>
+  <p class="body-text">Product language never uses: wallet, contract, gas, chain, transaction hash, blockchain. It uses: account, agreement, verified, permanent record.</p>
+</section>
+
+<!-- PART 6: BUSINESS MODEL -->
+<section class="wp-section" id="business-model">
+  <div class="section-label">Part 6</div>
+  <h2 class="section-title">Business Model</h2>
+
+  <h3 class="section-subtitle">Subscription Tiers (Live at MVP)</h3>
+  <div class="table-wrap">
+    <table class="spec-table">
+      <thead>
+        <tr><th>Tier</th><th>Annual Price</th><th>Monthly Price</th><th>Seats</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Basic</td><td class="mono">$6.99/month</td><td class="mono">$9.99/month</td><td class="mono">1</td></tr>
+        <tr><td>Premium</td><td class="mono">$11.99/month</td><td class="mono">$14.99/month</td><td class="mono">1</td></tr>
+        <tr><td>Enterprise (3-seat)</td><td class="mono">$45/month</td><td class="mono">$55/month</td><td class="mono">3</td></tr>
+        <tr><td>Enterprise (5-seat)</td><td class="mono">$75/month</td><td class="mono">$85/month</td><td class="mono">5</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="section-subtitle">Transaction Fees (Phase 2)</h3>
+  <p class="body-text">Distributor royalties settled to local currency: 0.5% transaction fee plus 2% FX spread. Distributor royalties settled to USDC.e: 0.5% transaction fee only. CMO royalties received through a WavCash named virtual account: 9.5% commission plus 0.5% processing fee.</p>
+
+  <h3 class="section-subtitle">Revenue Projections</h3>
+  <div class="stat-block">
+    <span class="stat-label">250 label/manager accounts at $75/month</span>
+    <span class="stat-value">$225K ARR</span>
+  </div>
+  <div class="stat-block">
+    <span class="stat-label">10,000 individual rights holders at $12/month</span>
+    <span class="stat-value">$1.44M ARR</span>
+  </div>
+  <div class="stat-block">
+    <span class="stat-label">Combined subscription base</span>
+    <span class="stat-value">~$1.67M ARR</span>
+  </div>
+  <p class="body-text" style="margin-top:20px;">Transaction revenue in Phase 2: A 2.5 percent effective rate on royalty flow through the platform generates approximately $2 million per one percent of regional streaming revenue captured.</p>
+
+  <h3 class="section-subtitle">Future Revenue Streams</h3>
+  <p class="body-text">Phase 5 introduces royalty advances underwritten by oracle trajectory data and earnings history, a WavCash card funded by royalty balance, earnings-linked savings, and float yield on idle balances passed partially to rights holders as an incentive for keeping balance on platform.</p>
+  <p class="body-text">Phase 6 introduces anonymized market intelligence sold to labels and DSPs, API licensing to distributors and third parties, and a track licensing marketplace with onchain agreements and settlements for beat licensing. Producers can license beats directly on the platform with ownership terms baked into the agreement and automatic royalty routing upon release.</p>
+</section>
+
+<!-- PART 7: GO-TO-MARKET -->
+<section class="wp-section" id="go-to-market">
+  <div class="section-label">Part 7</div>
+  <h2 class="section-title">Go-to-Market</h2>
+
+  <h3 class="section-subtitle">Phase 1: Rights Holder Direct</h3>
+  <p class="body-text">Launch in Nigeria and South Africa with the Royalty Sniffer as the primary acquisition tool. Any rights holder pastes their Spotify URL and sees an estimate of their royalties and missing money before creating an account. The conversion prompt is "Claim your earnings, create a free account." Organic sharing is natural: "I found $X I did not know I was owed." Target: 5,000 rights holders in six months.</p>
+
+  <h3 class="section-subtitle">Phase 2: Label Partnerships and Payments Launch</h3>
+  <p class="body-text">Enterprise tooling ships alongside payment infrastructure. Labels who join bring their entire roster into the payout system at once. The Splits viral loop activates simultaneously: every Split agreement notifies two to five new people, and every signing page prompts account creation.</p>
+
+  <h3 class="section-subtitle">Phase 3 and Beyond</h3>
+  <p class="body-text">Distributor OAuth integrations replace CSV upload with automatic statement sync. Kenya payment infrastructure activates. Ghana adds GHAMRO CMO integration. Colombia and Argentina follow in Phase 4. Financial products launch in Phase 5. Data marketplace and track licensing marketplace in Phase 6.</p>
+
+  <h3 class="section-subtitle">Milestone Summary</h3>
+  <div class="table-wrap">
+    <table class="spec-table">
+      <thead>
+        <tr><th>Timeline</th><th>Target</th><th>Focus</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">3 months</td><td class="amber">1,000 rights holders</td><td>MVP live. Royalty Sniffer launched. Nigeria and South Africa.</td></tr>
+        <tr><td class="mono">6 months</td><td class="amber">5,000 rights holders</td><td>Enterprise tier live. Onchain Splits active.</td></tr>
+        <tr><td class="mono">12 months</td><td class="amber">5,000+ users + 50 label accounts</td><td>Payment rails live in Nigeria, Brazil, and South Africa. First transaction revenue.</td></tr>
+        <tr><td class="mono">18 months</td><td class="amber">25,000 rights holders</td><td>$1M+ ARR.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CONCLUSION -->
+<section class="wp-section" id="conclusion">
+  <div class="section-label">Conclusion</div>
+  <h2 class="section-title">Your music. Your money. Finally.</h2>
+
+  <p class="body-text">The global music industry is worth $29.6 billion and growing. The fastest-growing markets are Africa and Latin America. The rights holders in those markets are building global careers on infrastructure that was not designed for them: opaque, slow, fragmented, and expensive.</p>
+
+  <p class="body-text">WavCash is transparent by design, fast by architecture, and built from the ground up for the rights holder in Lagos, Sao Paulo, or Nairobi who deserves to know exactly how their music is earning and to receive that money in a form they can use, now, not in six months. The oracle is tamper-proof. The splits are permanent. The payment rails are local. Settlements land in local currency or USDC, whichever the rights holder prefers. The product serves everyone: artists, producers, songwriters, session musicians, publishers, and the managers and labels who work with them all.</p>
+</section>
+
+<!-- FOOTER -->
+<div class="wp-footer">
+  <div class="footer-logo">
+    <svg width="22" height="18" viewBox="0 0 26 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+      <line x1="9" y1="4" x2="9" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="13" y1="2" x2="13" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <line x1="17" y1="4" x2="17" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+    </svg>
+    <span class="footer-logo-text">WavCash</span>
+  </div>
+  <div class="footer-tagline">Your royalties, finally visible.</div>
+  <div class="footer-url">wav.cash</div>
+</div>
+
+</div>
+</div>
+
+<script>
+  // Theme toggle
+  function toggleTheme() {
+    document.documentElement.classList.toggle('light-mode');
+  }
+
+  // Keyboard shortcut: L to toggle theme
+  document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'l' || e.key === 'L') toggleTheme();
+  });
+
+  // Scroll spy for sidebar TOC
+  (function() {
+    var sections = document.querySelectorAll('.wp-section, .cover');
+    var links = document.querySelectorAll('.toc-link');
+
+    if (!sections.length || !links.length) return;
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var id = entry.target.id;
+          links.forEach(function(link) {
+            link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+
+    sections.forEach(function(section) {
+      if (section.id) observer.observe(section);
+    });
+  })();
+</script>
+</body>
+</html>
