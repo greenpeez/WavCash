@@ -290,9 +290,15 @@ export async function GET(request: Request) {
             // Non-critical - token fees will be retried next cycle
           }
         } catch (err) {
-          tokenStats[token.dbKey].failed++;
           const errorMsg =
             err instanceof Error ? err.message : "Unknown error";
+          // "unknown reason" = function selector not found on contract (old v1 without token support)
+          // Skip silently — the contract simply doesn't support ERC-20 distribution
+          if (errorMsg.includes("unknown reason")) {
+            tokenStats[token.dbKey].skipped++;
+            continue;
+          }
+          tokenStats[token.dbKey].failed++;
           console.error(
             `${token.symbol} distribution failed for split ${split.id}:`,
             errorMsg
