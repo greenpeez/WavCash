@@ -10,6 +10,7 @@ import {
   getPendingTokenFees,
   callCollectTokenFees,
   SUPPORTED_TOKENS,
+  getContractState,
 } from "@/lib/contracts/interact";
 import { formatEther, formatUnits } from "viem";
 import { createNotification } from "@/lib/notifications/create";
@@ -82,11 +83,29 @@ export async function GET(request: Request) {
       error?: string;
     }> = [];
 
+    // Track which contracts are on-chain Active — reused by the token pass
+    const activeContractAddresses = new Set<string>();
+
     for (const split of splits) {
       const contractAddress = split.contract_address as `0x${string}`;
 
+      // Check contract type — own try/catch so incompatible contracts don't pollute stats
       try {
-        // Check if there's any balance to distribute
+        const contractState = await getContractState(contractAddress);
+        if (contractState !== 1) {
+          skipped++;
+          results.push({ split_id: split.id, action: "skipped_not_active" });
+          continue;
+        }
+        activeContractAddresses.add(contractAddress);
+      } catch {
+        // state() not available — old RoyaltySplitter or unknown contract type
+        // Don't add to activeContractAddresses (skips token pass)
+        // Fall through to attempt AVAX distribution below
+      }
+
+      try {
+        // Check if there's any AVAX balance to distribute
         const { hasBalance, balance } =
           await hasDistributableBalance(contractAddress);
 
@@ -178,6 +197,12 @@ export async function GET(request: Request) {
     for (const token of SUPPORTED_TOKENS) {
       for (const split of splits) {
         const contractAddress = split.contract_address as `0x${string}`;
+
+        // Skip contracts that weren't Active in the AVAX pass
+        if (!activeContractAddresses.has(contractAddress)) {
+          tokenStats[token.dbKey].skipped++;
+          continue;
+        }
 
         try {
           const { hasBalance, balance } = await hasDistributableTokenBalance(
@@ -277,14 +302,7 @@ export async function GET(request: Request) {
             action: `failed_${token.dbKey}`,
             error: errorMsg,
           });
-
-          await supabase.from("distributions").insert({
-            split_id: split.id,
-            tx_hash: "0x0",
-            token_type: token.dbKey,
-            total_amount: "0",
-            status: "failed",
-          });
+          // No DB write — token failures are non-critical; avoid spamming false-failure rows
         }
       }
     }
