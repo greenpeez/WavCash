@@ -627,6 +627,31 @@ function IconBug() {
 }
 
 /* ================================================================
+   One-time check helpers
+   ================================================================ */
+
+const LS_KEY_SNIFFED = "wavcash-sniffed-urls";
+
+function extractArtistIdClient(url: string): string | null {
+  const m = url.match(/spotify\.com\/artist\/([a-zA-Z0-9]+)/) || url.match(/spotify:artist:([a-zA-Z0-9]+)/);
+  return m ? m[1] : null;
+}
+
+function getSniffedUrls(): string[] {
+  try { return JSON.parse(localStorage.getItem(LS_KEY_SNIFFED) || "[]"); } catch { return []; }
+}
+
+function addSniffedUrl(artistId: string): void {
+  try {
+    const existing = getSniffedUrls();
+    if (!existing.includes(artistId)) {
+      existing.push(artistId);
+      localStorage.setItem(LS_KEY_SNIFFED, JSON.stringify(existing));
+    }
+  } catch {}
+}
+
+/* ================================================================
    Component
    ================================================================ */
 
@@ -670,6 +695,17 @@ function SnifferContent() {
   // ---- Business logic ----
   async function doSearch(query: string) {
     if (!query.trim()) return;
+
+    // One-time check: block repeat searches for unauthenticated users
+    const artistId = extractArtistIdClient(query.trim());
+    if (artistId && !isLoggedIn) {
+      const sniffed = getSniffedUrls();
+      if (sniffed.includes(artistId)) {
+        setError("You've already sniffed this artist's royalties. Sign up to unlock unlimited searches.");
+        return;
+      }
+    }
+
     setUrl(query);
     setLoading(true);
     setError(null);
@@ -690,6 +726,8 @@ function SnifferContent() {
       }
 
       setResult(data);
+      // Record this artist as sniffed
+      if (artistId) addSniffedUrl(artistId);
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -962,7 +1000,7 @@ function SnifferContent() {
           <form onSubmit={handleSearch} style={{ display: "flex", gap: 12, marginBottom: DEV_BYPASS ? 12 : 40 }}>
             <input
               className="glass-input"
-              placeholder="Paste your Spotify artist link..."
+              placeholder="Paste your Spotify artist link"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               disabled={loading}

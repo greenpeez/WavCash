@@ -1052,7 +1052,7 @@ export default function HomePage() {
               <input
                 className="search-input"
                 type="text"
-                placeholder="Search any ISRC, artist, or track..."
+                placeholder="Paste your Spotify artist link"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") goSnifferWithQuery(); }}
