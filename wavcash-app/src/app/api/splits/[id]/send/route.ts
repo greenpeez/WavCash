@@ -205,7 +205,7 @@ export async function POST(
     }
 
     // ── Send invite emails via Resend ────────────────────────────────
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://wavcash.com";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://wav.cash";
     const trackInfo = split.tracks as unknown as { title: string; isrc: string } | null;
     const trackTitle = trackInfo?.title || split.title;
     const resend = getResendClient();

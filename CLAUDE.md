@@ -29,6 +29,16 @@ backdrop-filter: blur(20px);
 - Split agreement titles use **colon** separator: `Track Name: Split Agreement` (not em dash)
 - Track dropdown uses **middle dot**: `Title · ISRC`
 
+## Domain
+
+- The WavCash domain is **wav.cash** (not wavcash.com). All links, emails, and references must use `wav.cash`.
+- Email: `hello@wav.cash`
+- Twitter/X: `x.com/wavcash`
+
+## Copy Guidelines
+
+- **Never use em dashes** in user-facing copy. Use colons or rewrite the sentence instead.
+
 ## Mercury Canvas — Default Loading Protocol
 
 Every page with an inline mercury WebGL canvas **must** include the reveal pattern. The layout.tsx inline script sets `body.style.opacity = '0'` on load. Each mercury page is responsible for setting it back to `'1'` after the first frame draws.

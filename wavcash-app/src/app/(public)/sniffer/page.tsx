@@ -11,22 +11,15 @@ const DEV_BYPASS = process.env.NEXT_PUBLIC_DEV_BYPASS === "true";
    Interfaces
    ================================================================ */
 
-interface DspBreakdown {
-  platform: string;
-  estimated_streams: number;
-  rate: number;
-  estimated_earnings: number;
-}
-
 interface TrackResult {
   title: string;
   isrc: string | null;
   album: string;
   album_art_url: string | null;
   popularity: number;
-  estimated_monthly_streams: number;
-  dsp_breakdown: DspBreakdown[];
-  total_monthly_estimated: number;
+  total_streams: number;
+  total_estimated_earnings: number;
+  data_source: "rapidapi" | "heuristic";
 }
 
 interface SnifferResponse {
@@ -37,18 +30,11 @@ interface SnifferResponse {
     popularity: number;
   };
   tracks: TrackResult[];
-  total_annual_estimate: number;
-  total_monthly_estimate: number;
+  total_streams: number;
+  total_estimated_earnings: number;
+  data_source: "rapidapi" | "heuristic";
   disclaimer: string;
 }
-
-const PLATFORM_LABELS: Record<string, string> = {
-  spotify: "Spotify",
-  apple_music: "Apple Music",
-  youtube_music: "YouTube Music",
-  amazon_music: "Amazon Music",
-  tidal: "Tidal",
-};
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("en-US", {
@@ -75,15 +61,9 @@ const MOCK_TRACKS: TrackResult[] = [
     album: "Love, Damini",
     album_art_url: "",
     popularity: 85,
-    estimated_monthly_streams: 2250000,
-    dsp_breakdown: [
-      { platform: "spotify", estimated_streams: 1350000, rate: 0.0035, estimated_earnings: 4725.0 },
-      { platform: "apple_music", estimated_streams: 337500, rate: 0.006, estimated_earnings: 2025.0 },
-      { platform: "youtube_music", estimated_streams: 270000, rate: 0.002, estimated_earnings: 540.0 },
-      { platform: "amazon_music", estimated_streams: 180000, rate: 0.004, estimated_earnings: 720.0 },
-      { platform: "tidal", estimated_streams: 112500, rate: 0.009, estimated_earnings: 1012.5 },
-    ],
-    total_monthly_estimated: 9022.5,
+    total_streams: 319000000,
+    total_estimated_earnings: 1276000.0,
+    data_source: "rapidapi",
   },
   {
     title: "City Boys",
@@ -91,15 +71,9 @@ const MOCK_TRACKS: TrackResult[] = [
     album: "Love, Damini",
     album_art_url: "",
     popularity: 72,
-    estimated_monthly_streams: 640000,
-    dsp_breakdown: [
-      { platform: "spotify", estimated_streams: 384000, rate: 0.0035, estimated_earnings: 1344.0 },
-      { platform: "apple_music", estimated_streams: 96000, rate: 0.006, estimated_earnings: 576.0 },
-      { platform: "youtube_music", estimated_streams: 76800, rate: 0.002, estimated_earnings: 153.6 },
-      { platform: "amazon_music", estimated_streams: 51200, rate: 0.004, estimated_earnings: 204.8 },
-      { platform: "tidal", estimated_streams: 32000, rate: 0.009, estimated_earnings: 288.0 },
-    ],
-    total_monthly_estimated: 2566.4,
+    total_streams: 85000000,
+    total_estimated_earnings: 340000.0,
+    data_source: "rapidapi",
   },
   {
     title: "Kilometre",
@@ -107,15 +81,9 @@ const MOCK_TRACKS: TrackResult[] = [
     album: "Twice As Tall",
     album_art_url: "",
     popularity: 68,
-    estimated_monthly_streams: 460000,
-    dsp_breakdown: [
-      { platform: "spotify", estimated_streams: 276000, rate: 0.0035, estimated_earnings: 966.0 },
-      { platform: "apple_music", estimated_streams: 69000, rate: 0.006, estimated_earnings: 414.0 },
-      { platform: "youtube_music", estimated_streams: 55200, rate: 0.002, estimated_earnings: 110.4 },
-      { platform: "amazon_music", estimated_streams: 36800, rate: 0.004, estimated_earnings: 147.2 },
-      { platform: "tidal", estimated_streams: 23000, rate: 0.009, estimated_earnings: 207.0 },
-    ],
-    total_monthly_estimated: 1844.6,
+    total_streams: 62000000,
+    total_estimated_earnings: 248000.0,
+    data_source: "rapidapi",
   },
   {
     title: "Ye",
@@ -123,15 +91,9 @@ const MOCK_TRACKS: TrackResult[] = [
     album: "African Giant",
     album_art_url: "",
     popularity: 65,
-    estimated_monthly_streams: 325000,
-    dsp_breakdown: [
-      { platform: "spotify", estimated_streams: 195000, rate: 0.0035, estimated_earnings: 682.5 },
-      { platform: "apple_music", estimated_streams: 48750, rate: 0.006, estimated_earnings: 292.5 },
-      { platform: "youtube_music", estimated_streams: 39000, rate: 0.002, estimated_earnings: 78.0 },
-      { platform: "amazon_music", estimated_streams: 26000, rate: 0.004, estimated_earnings: 104.0 },
-      { platform: "tidal", estimated_streams: 16250, rate: 0.009, estimated_earnings: 146.25 },
-    ],
-    total_monthly_estimated: 1303.25,
+    total_streams: 48000000,
+    total_estimated_earnings: 192000.0,
+    data_source: "rapidapi",
   },
   {
     title: "On the Low",
@@ -139,19 +101,64 @@ const MOCK_TRACKS: TrackResult[] = [
     album: "African Giant",
     album_art_url: "",
     popularity: 60,
-    estimated_monthly_streams: 190000,
-    dsp_breakdown: [
-      { platform: "spotify", estimated_streams: 114000, rate: 0.0035, estimated_earnings: 399.0 },
-      { platform: "apple_music", estimated_streams: 28500, rate: 0.006, estimated_earnings: 171.0 },
-      { platform: "youtube_music", estimated_streams: 22800, rate: 0.002, estimated_earnings: 45.6 },
-      { platform: "amazon_music", estimated_streams: 15200, rate: 0.004, estimated_earnings: 60.8 },
-      { platform: "tidal", estimated_streams: 9500, rate: 0.009, estimated_earnings: 85.5 },
-    ],
-    total_monthly_estimated: 761.9,
+    total_streams: 35000000,
+    total_estimated_earnings: 140000.0,
+    data_source: "rapidapi",
+  },
+  {
+    title: "Anybody",
+    isrc: "USRC17607844",
+    album: "African Giant",
+    album_art_url: "",
+    popularity: 58,
+    total_streams: 28000000,
+    total_estimated_earnings: 112000.0,
+    data_source: "rapidapi",
+  },
+  {
+    title: "Wonderful",
+    isrc: "USRC17607845",
+    album: "Love, Damini",
+    album_art_url: "",
+    popularity: 55,
+    total_streams: 22000000,
+    total_estimated_earnings: 88000.0,
+    data_source: "rapidapi",
+  },
+  {
+    title: "Gbona",
+    isrc: "USRC17607846",
+    album: "Outside",
+    album_art_url: "",
+    popularity: 52,
+    total_streams: 18000000,
+    total_estimated_earnings: 72000.0,
+    data_source: "rapidapi",
+  },
+  {
+    title: "Dangote",
+    isrc: "USRC17607847",
+    album: "African Giant",
+    album_art_url: "",
+    popularity: 50,
+    total_streams: 15000000,
+    total_estimated_earnings: 60000.0,
+    data_source: "rapidapi",
+  },
+  {
+    title: "Pull Up",
+    isrc: "USRC17607848",
+    album: "African Giant",
+    album_art_url: "",
+    popularity: 48,
+    total_streams: 12000000,
+    total_estimated_earnings: 48000.0,
+    data_source: "rapidapi",
   },
 ];
 
-const MOCK_MONTHLY = MOCK_TRACKS.reduce((s, t) => s + t.total_monthly_estimated, 0);
+const MOCK_TOTAL_EARNINGS = MOCK_TRACKS.reduce((s, t) => s + t.total_estimated_earnings, 0);
+const MOCK_TOTAL_STREAMS = MOCK_TRACKS.reduce((s, t) => s + t.total_streams, 0);
 
 const MOCK_SNIFFER_RESULT: SnifferResponse = {
   artist: {
@@ -161,10 +168,10 @@ const MOCK_SNIFFER_RESULT: SnifferResponse = {
     popularity: 88,
   },
   tracks: MOCK_TRACKS,
-  total_annual_estimate: Math.round(MOCK_MONTHLY * 12 * 100) / 100,
-  total_monthly_estimate: Math.round(MOCK_MONTHLY * 100) / 100,
-  disclaimer:
-    "Estimates based on verified published per-stream rates and track performance indicators. Create an account to upload your statements and see your real gap.",
+  total_streams: MOCK_TOTAL_STREAMS,
+  total_estimated_earnings: Math.round(MOCK_TOTAL_EARNINGS * 100) / 100,
+  data_source: "rapidapi",
+  disclaimer: "Earnings estimated using verified published per-stream rates.",
 };
 
 /* ================================================================
@@ -625,6 +632,9 @@ function IconAlert() {
 function IconBug() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>;
 }
+function IconDownload() {
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
+}
 
 /* ================================================================
    One-time check helpers
@@ -649,6 +659,88 @@ function addSniffedUrl(artistId: string): void {
       localStorage.setItem(LS_KEY_SNIFFED, JSON.stringify(existing));
     }
   } catch {}
+}
+
+/* ================================================================
+   PDF HTML builder
+   ================================================================ */
+
+function fmtCurrPdf(n: number) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
+}
+function fmtNumPdf(n: number) {
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return n.toLocaleString();
+}
+
+function buildPdfHtml(data: SnifferResponse): string {
+  const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+  const trackRows = data.tracks
+    .map(
+      (t) =>
+        `<tr>
+          <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:13px;">${t.title}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:12px;color:#666;font-family:monospace;">${t.isrc || "-"}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:13px;text-align:right;font-family:monospace;">${fmtNumPdf(t.total_streams)}</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #eee;font-size:13px;text-align:right;font-family:monospace;font-weight:600;">${fmtCurrPdf(t.total_estimated_earnings)}</td>
+        </tr>`
+    )
+    .join("");
+
+  return `
+    <div style="max-width:680px;margin:0 auto;font-family:'Plus Jakarta Sans','Helvetica Neue',Arial,sans-serif;color:#1a1a1a;line-height:1.5;">
+      <!-- Header: all elements as inline-block siblings in one div, no containers -->
+      <div style="margin-bottom:4px;white-space:nowrap;line-height:24px;">
+        <span style="display:inline-block;width:2px;height:10px;background:rgba(212,136,58,0.35);vertical-align:middle;margin-right:1px;"></span>
+        <span style="display:inline-block;width:3px;height:16px;background:rgba(212,136,58,0.65);vertical-align:middle;margin-right:1px;"></span>
+        <span style="display:inline-block;width:4px;height:22px;background:#D4883A;vertical-align:middle;margin-right:1px;"></span>
+        <span style="display:inline-block;width:3px;height:16px;background:rgba(212,136,58,0.65);vertical-align:middle;margin-right:1px;"></span>
+        <span style="display:inline-block;width:2px;height:10px;background:rgba(212,136,58,0.35);vertical-align:middle;margin-right:6px;"></span>
+        <span style="font-weight:700;font-size:18px;letter-spacing:-0.5px;vertical-align:middle;">WavCash</span>
+      </div>
+      <h1 style="font-size:22px;font-weight:700;margin:16px 0 4px;">Royalty Report: ${data.artist.name}</h1>
+      <p style="font-size:12px;color:#888;margin:0 0 24px;">${today}</p>
+
+      <!-- Stat boxes -->
+      <div style="display:flex;gap:12px;margin-bottom:24px;">
+        <div style="flex:1;background:#FEF3E2;border-radius:10px;padding:16px 20px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#B97720;margin-bottom:4px;">Total Streams</div>
+          <div style="font-size:22px;font-weight:700;font-family:monospace;color:#1a1a1a;">${fmtNumPdf(data.total_streams)}</div>
+        </div>
+        <div style="flex:1;background:#FEF3E2;border-radius:10px;padding:16px 20px;text-align:center;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#B97720;margin-bottom:4px;">Total Estimated Earnings</div>
+          <div style="font-size:22px;font-weight:700;font-family:monospace;color:#D4883A;">${fmtCurrPdf(data.total_estimated_earnings)}</div>
+        </div>
+      </div>
+
+      <!-- Track breakdown -->
+      <h2 style="font-size:15px;font-weight:600;margin:0 0 8px;">Track Breakdown</h2>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+        <thead>
+          <tr style="background:#f5f5f5;">
+            <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#B97720;">Title</th>
+            <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#B97720;">ISRC</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#B97720;">Total Streams</th>
+            <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#B97720;">Total Earnings</th>
+          </tr>
+        </thead>
+        <tbody>${trackRows}</tbody>
+      </table>
+
+      <!-- Signup hook -->
+      <div style="background:#FEF3E2;border:1px solid #F0D9B5;border-radius:10px;padding:16px 20px;text-align:center;margin-bottom:16px;">
+        <p style="font-size:13px;color:#8B6914;margin:0;">This covers your top ${data.tracks.length} tracks. Sign up at <strong>wav.cash</strong> to scan your full catalog.</p>
+      </div>
+
+      <!-- Disclaimer -->
+      <p style="font-size:11px;color:#999;text-align:center;font-style:italic;line-height:1.6;margin-bottom:8px;">
+        ${data.disclaimer}
+      </p>
+      <p style="font-size:11px;color:#bbb;text-align:center;">wav.cash</p>
+    </div>
+  `;
 }
 
 /* ================================================================
@@ -679,7 +771,7 @@ function SnifferContent() {
   const rootRef = useRef<HTMLDivElement>(null);
   const lightModeRef = useRef(false);
 
-  const { ready, authenticated } = usePrivy();
+  const { ready, authenticated, getAccessToken } = usePrivy();
   const isLoggedIn = ready && authenticated;
   const router = useRouter();
 
@@ -691,6 +783,37 @@ function SnifferContent() {
     try { localStorage.setItem("wavcash-theme", val); localStorage.setItem("theme", val); } catch {}
   };
   const goCta = () => router.push(isLoggedIn ? "/dashboard" : "/login");
+
+  // ---- PDF download ----
+  async function downloadPdf(data: SnifferResponse) {
+    try {
+      const html2pdf = (await import("html2pdf.js")).default;
+      const container = document.createElement("div");
+      container.innerHTML = buildPdfHtml(data);
+      container.style.maxWidth = "680px";
+      container.style.margin = "0 auto";
+      container.style.padding = "32px 24px 48px";
+      container.style.fontFamily = "'Plus Jakarta Sans', -apple-system, sans-serif";
+      container.style.fontSize = "13px";
+      container.style.lineHeight = "1.6";
+      container.style.background = "white";
+      container.style.color = "#1a1a1a";
+
+      await html2pdf()
+        .set({
+          margin: [15, 15, 15, 15],
+          filename: `${data.artist.name} - WavCash Royalty Report.pdf`,
+          image: { type: "png" },
+          html2canvas: { scale: 2, backgroundColor: "#ffffff" },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["css", "legacy"] },
+        })
+        .from(container)
+        .save();
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+    }
+  }
 
   // ---- Business logic ----
   async function doSearch(query: string) {
@@ -712,9 +835,17 @@ function SnifferContent() {
     setResult(null);
 
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (isLoggedIn) {
+        try {
+          const token = await getAccessToken();
+          if (token) headers["Authorization"] = `Bearer ${token}`;
+        } catch {}
+      }
+
       const res = await fetch("/api/sniffer", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ spotifyUrl: query.trim() }),
       });
 
@@ -1038,24 +1169,38 @@ function SnifferContent() {
           {/* Results */}
           {result && (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {/* Download banner */}
+              <div style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
+                padding: "14px 20px", borderRadius: 12,
+                background: "rgba(212,136,58,0.08)", border: "1px solid rgba(212,136,58,0.2)",
+              }}>
+                <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
+                  Download your results: you won&apos;t be able to view them again without an account.
+                </p>
+                <button
+                  type="button"
+                  className="btn-primary"
+                  style={{ flexShrink: 0, padding: "10px 18px", fontSize: 13 }}
+                  onClick={() => downloadPdf(result)}
+                >
+                  <IconDownload /> Download PDF
+                </button>
+              </div>
+
               {/* Artist card */}
               <div className="glass-card" style={{ display: "flex", alignItems: "center", gap: 16, padding: "24px 28px" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h2 style={{ fontFamily: "'General Sans', sans-serif", fontSize: 24, fontWeight: 700 }}>
                     {result.artist.name}
                   </h2>
-                  {result.artist.genres.length > 0 && (
-                    <p style={{ fontSize: 13, color: "var(--text-tertiary)" }}>
-                      {result.artist.genres.slice(0, 3).join(" \u00B7 ")}
-                    </p>
-                  )}
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <p style={{
                     fontFamily: "'JetBrains Mono', monospace",
                     fontSize: 24, fontWeight: 700, color: "var(--accent)",
                   }}>
-                    {formatCurrency(result.total_annual_estimate)}
+                    {formatCurrency(result.total_estimated_earnings)}
                   </p>
                   <p style={{
                     fontFamily: "'JetBrains Mono', monospace",
@@ -1063,7 +1208,7 @@ function SnifferContent() {
                     color: "var(--text-tertiary)",
                     textTransform: "uppercase", letterSpacing: "1.5px",
                   }}>
-                    Est. last 12 months
+                    Total estimated earnings
                   </p>
                 </div>
               </div>
@@ -1078,10 +1223,10 @@ function SnifferContent() {
                     textTransform: "uppercase", letterSpacing: "1.5px",
                     marginBottom: 4,
                   }}>
-                    Monthly estimate
+                    Total streams
                   </p>
                   <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 700 }}>
-                    {formatCurrency(result.total_monthly_estimate)}
+                    {formatNumber(result.total_streams)}
                   </p>
                 </div>
                 <div className="glass-card" style={{ textAlign: "center", padding: "20px 16px" }}>
@@ -1092,7 +1237,7 @@ function SnifferContent() {
                     textTransform: "uppercase", letterSpacing: "1.5px",
                     marginBottom: 4,
                   }}>
-                    Tracks analyzed
+                    Top tracks analyzed
                   </p>
                   <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 700 }}>
                     {result.tracks.length}
@@ -1112,7 +1257,8 @@ function SnifferContent() {
                   <thead>
                     <tr>
                       <th>Track</th>
-                      <th className="text-right">Est. Monthly</th>
+                      <th className="text-right">Total Streams</th>
+                      <th className="text-right">Total Earnings</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1141,14 +1287,15 @@ function SnifferContent() {
                                 {track.isrc && (
                                   <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>{track.isrc}</span>
                                 )}
-                                {track.isrc && " \u00B7 "}
-                                ~{formatNumber(track.estimated_monthly_streams)} streams/mo
                               </p>
                             </div>
                           </div>
                         </td>
-                        <td className="text-right" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, whiteSpace: "nowrap" }}>
-                          {formatCurrency(track.total_monthly_estimated)}
+                        <td className="text-right" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, whiteSpace: "nowrap" }}>
+                          {formatNumber(track.total_streams)}
+                        </td>
+                        <td className="text-right" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, whiteSpace: "nowrap", fontWeight: 500 }}>
+                          {formatCurrency(track.total_estimated_earnings)}
                         </td>
                       </tr>
                     ))}
@@ -1156,66 +1303,14 @@ function SnifferContent() {
                 </table>
               </div>
 
-              {/* Platform breakdown */}
-              <div className="glass-card">
-                <h3 style={{
-                  fontFamily: "'General Sans', sans-serif",
-                  fontSize: 16, fontWeight: 600, marginBottom: 16,
-                }}>
-                  Platform Breakdown
-                </h3>
-                <table className="glass-table">
-                  <thead>
-                    <tr>
-                      <th>Platform</th>
-                      <th className="text-right">Rate/Stream</th>
-                      <th className="text-right">Est. Streams</th>
-                      <th className="text-right">Est. Monthly</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.keys(PLATFORM_LABELS).map((platform) => {
-                      const totals = result.tracks.reduce(
-                        (acc, track) => {
-                          const dsp = track.dsp_breakdown.find(
-                            (d) => d.platform === platform
-                          );
-                          if (dsp) {
-                            acc.streams += dsp.estimated_streams;
-                            acc.earnings += dsp.estimated_earnings;
-                            acc.rate = dsp.rate;
-                          }
-                          return acc;
-                        },
-                        { streams: 0, earnings: 0, rate: 0 }
-                      );
-
-                      return (
-                        <tr key={platform}>
-                          <td style={{ fontWeight: 500, fontSize: 14 }}>
-                            {PLATFORM_LABELS[platform]}
-                          </td>
-                          <td className="text-right" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: "var(--text-tertiary)" }}>
-                            ${totals.rate.toFixed(4)}
-                          </td>
-                          <td className="text-right" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13 }}>
-                            {formatNumber(totals.streams)}
-                          </td>
-                          <td className="text-right" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, fontWeight: 500 }}>
-                            {formatCurrency(totals.earnings)}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              {/* Signup hook */}
+              <p style={{ fontSize: 13, color: "var(--text-secondary)", textAlign: "center", lineHeight: 1.6 }}>
+                This covers your top {result.tracks.length} tracks. Sign up to scan your full catalog.
+              </p>
 
               {/* Disclaimer */}
               <p className="disclaimer">
-                Estimates based on verified published per-stream rates and track performance indicators.
-                <br />
-                Create an account to upload your statements and see your real gap.
+                {result.disclaimer}
               </p>
 
               {/* CTA */}
@@ -1258,7 +1353,7 @@ function SnifferContent() {
                 <a href="https://x.com/wavcash" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="X (Twitter)">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
                 </a>
-                <a href="mailto:hello@wavcash.com" className="social-icon" aria-label="Email">
+                <a href="mailto:hello@wav.cash" className="social-icon" aria-label="Email">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
                 </a>
               </div>
