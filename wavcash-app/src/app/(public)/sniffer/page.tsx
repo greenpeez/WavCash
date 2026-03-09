@@ -2,8 +2,7 @@
 
 import { Suspense, useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useTheme } from "next-themes";
+import { useRouter, useSearchParams } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 
 const DEV_BYPASS = process.env.NEXT_PUBLIC_DEV_BYPASS === "true";
@@ -181,7 +180,11 @@ const SNIFFER_CSS = `
   --accent: #D4883A;
   --bg-surface: rgba(232,236,240,0.06);
   --border-subtle: rgba(232,236,240,0.12);
+  --bg-btn-primary: #fff;
+  --text-btn-primary: #000;
+  --nav-underline: #fff;
   position: relative; width: 100%; min-height: 100vh; overflow-x: hidden;
+  display: flex; flex-direction: column;
   background: var(--bg-body);
   font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
   color: var(--text-primary);
@@ -194,7 +197,83 @@ const SNIFFER_CSS = `
   --accent: #D4883A;
   --bg-surface: rgba(0,0,0,0.04);
   --border-subtle: rgba(0,0,0,0.10);
+  --bg-btn-primary: #1A1A1A;
+  --text-btn-primary: #F8F6F3;
+  --nav-underline: #1A1A1A;
 }
+/* ---- TOP NAV ---- */
+.sniffer-root .top-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 40px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  transition: background 0.6s ease, border-color 0.6s ease;
+}
+.sniffer-root .nav-logo {
+  font-family: var(--font-general-sans), 'General Sans', sans-serif;
+  font-weight: 700; font-size: 22px; letter-spacing: -0.5px;
+  color: var(--text-primary);
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; transition: color 0.8s ease;
+}
+.sniffer-root .nav-logo:hover { color: var(--accent); }
+.sniffer-root .nav-logo svg { color: inherit; transition: transform 0.8s ease, color 0.8s ease; }
+.sniffer-root .nav-logo:hover svg { transform: scale(1.08); }
+.sniffer-root .nav-links { display: flex; gap: 0; align-items: center; }
+.sniffer-root .nav-link {
+  font-size: 14px; font-weight: 500; color: var(--text-secondary);
+  text-decoration: none; background: none; border: none;
+  position: relative; padding: 4px 16px; transition: color 0.8s ease;
+  font-family: inherit;
+}
+.sniffer-root .nav-link::after {
+  content: ''; position: absolute; bottom: -2px; left: 0;
+  width: 0; height: 1.5px;
+  background: var(--nav-underline);
+  transition: width 0.5s ease, background 0.5s ease;
+}
+.sniffer-root .nav-link:hover { color: var(--accent); }
+.sniffer-root .nav-link:hover::after { width: 0; }
+.sniffer-root .nav-link.active { color: var(--accent); }
+.sniffer-root .nav-link.active::after { width: 100%; background: var(--accent); }
+.sniffer-root .nav-right { display: flex; align-items: center; gap: 0; }
+.sniffer-root .nav-hit {
+  display: flex; align-items: center; padding: 0 16px;
+}
+.sniffer-root .theme-toggle {
+  background: none; border: 1px solid var(--border-subtle);
+  border-radius: 8px; padding: 7px 9px; display: flex;
+  align-items: center; justify-content: center;
+  color: var(--text-secondary); transition: all 0.5s ease;
+}
+.sniffer-root .theme-toggle:hover {
+  color: var(--accent);
+  border-color: rgba(212,136,58,0.35);
+  background: rgba(212,136,58,0.08);
+}
+.sniffer-root .theme-toggle svg { width: 16px; height: 16px; transition: transform 0.5s ease; }
+.sniffer-root .theme-toggle:hover svg { transform: rotate(15deg) scale(1.1); }
+.sniffer-root .icon-sun { display: block; }
+.sniffer-root .icon-moon { display: none; }
+.sniffer-root[data-theme="light"] .icon-sun { display: none; }
+.sniffer-root[data-theme="light"] .icon-moon { display: block; }
+.sniffer-root .nav-cta {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-btn-primary); background: var(--bg-btn-primary);
+  border: none; border-radius: 8px; padding: 10px 22px;
+  letter-spacing: 0.2px;
+  transition: transform 0.5s ease, box-shadow 0.5s ease, background 0.4s ease, color 0.4s ease;
+}
+.sniffer-root .nav-cta:hover {
+  background: var(--accent); color: #000;
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 4px 20px rgba(212,136,58,0.25), 0 0 0 1px rgba(212,136,58,0.15);
+}
+.sniffer-root .nav-cta:active { transform: scale(0.98); }
+
 /* Canvas */
 .sniffer-root canvas {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
@@ -204,7 +283,8 @@ const SNIFFER_CSS = `
 /* Content area */
 .sniffer-root .ui-content {
   position: relative; z-index: 10;
-  max-width: 720px; margin: 0 auto; padding: 48px 24px 80px;
+  max-width: 720px; margin: 0 auto; padding: 120px 24px 80px;
+  flex: 1;
 }
 
 /* Glass badge */
@@ -408,6 +488,33 @@ const SNIFFER_CSS = `
   animation: sniffer-spin 0.6s linear infinite;
 }
 @keyframes sniffer-spin { to { transform: rotate(360deg); } }
+
+/* ---- FOOTER ---- */
+.sniffer-root .sniffer-footer { padding: 100px 0 60px; }
+.sniffer-root .footer-grid {
+  display: flex; justify-content: center; gap: 80px;
+}
+.sniffer-root .footer-grid > div {
+  display: flex; flex-direction: column; align-items: center;
+}
+.sniffer-root .footer-col-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--text-tertiary);
+  margin-bottom: 12px;
+}
+.sniffer-root .footer-link {
+  display: block; color: var(--text-secondary);
+  text-decoration: none; font-size: 13px; margin-bottom: 6px;
+  transition: color 0.3s ease;
+}
+.sniffer-root .footer-link:hover { color: var(--accent); }
+.sniffer-root .social-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.sniffer-root .social-icon {
+  color: var(--text-secondary); transition: color 0.3s ease;
+  display: flex; align-items: center;
+}
+.sniffer-root .social-icon:hover { color: var(--accent); }
 `;
 
 /* ================================================================
@@ -547,9 +654,18 @@ function SnifferContent() {
   const rootRef = useRef<HTMLDivElement>(null);
   const lightModeRef = useRef(false);
 
-  const { resolvedTheme, setTheme: setNextTheme } = useTheme();
   const { ready, authenticated } = usePrivy();
   const isLoggedIn = ready && authenticated;
+  const router = useRouter();
+
+  const toggleTheme = () => {
+    lightModeRef.current = !lightModeRef.current;
+    const val = lightModeRef.current ? "light" : "dark";
+    rootRef.current?.setAttribute("data-theme", val);
+    document.documentElement.style.background = lightModeRef.current ? "#F8F6F3" : "#0a0a0a";
+    try { localStorage.setItem("wavcash-theme", val); localStorage.setItem("theme", val); } catch {}
+  };
+  const goCta = () => router.push(isLoggedIn ? "/dashboard" : "/login");
 
   // ---- Business logic ----
   async function doSearch(query: string) {
@@ -608,17 +724,13 @@ function SnifferContent() {
   // ---- Theme sync ----
   useEffect(() => {
     try {
-      const landingTheme = localStorage.getItem("wavcash-theme");
-      if (landingTheme && landingTheme !== resolvedTheme) {
-        setNextTheme(landingTheme);
-        return;
-      }
+      const saved = localStorage.getItem("wavcash-theme") || localStorage.getItem("theme");
+      const isLight = saved === "light";
+      lightModeRef.current = isLight;
+      rootRef.current?.setAttribute("data-theme", isLight ? "light" : "dark");
+      document.documentElement.style.background = isLight ? "#F8F6F3" : "#0a0a0a";
     } catch {}
-
-    const isLight = resolvedTheme === "light";
-    lightModeRef.current = isLight;
-    rootRef.current?.setAttribute("data-theme", isLight ? "light" : "dark");
-  }, [resolvedTheme]);
+  }, []);
 
   // ---- Mercury surface ----
   useEffect(() => {
@@ -792,13 +904,13 @@ function SnifferContent() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: SNIFFER_CSS }} />
-      <div ref={rootRef} className="sniffer-root" data-theme={resolvedTheme === "light" ? "light" : "dark"}>
+      <div ref={rootRef} className="sniffer-root" data-theme="dark">
         <canvas ref={canvasRef} />
 
-        {/* Glass Nav — reuses dash-header* classes from globals.css */}
-        <nav className="dash-header" style={{ position: "sticky", top: 0 }}>
-          <Link href="/" className="dash-header-logo">
-            <svg width="26" height="22" viewBox="0 0 26 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Top Nav */}
+        <nav className="top-nav">
+          <Link href="/" className="nav-logo">
+            <svg width="26" height="22" viewBox="0 0 26 22" fill="none">
               <line x1="5.5" y1="6" x2="5.5" y2="16" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" opacity="0.3" />
               <line x1="9" y1="4" x2="9" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
               <line x1="13" y1="2" x2="13" y2="20" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
@@ -807,15 +919,22 @@ function SnifferContent() {
             </svg>
             WavCash
           </Link>
-          <div className="dash-header-right">
-            {isLoggedIn ? (
-              <Link href="/dashboard" className="btn-cta" style={{ display: "inline-block", textDecoration: "none" }}>My Dashboard</Link>
-            ) : (
-              <>
-                <Link href="/login" className="dash-header-link">Sign in</Link>
-                <Link href="/login" className="dash-header-cta">Get Started</Link>
-              </>
-            )}
+          <div className="nav-links">
+            <Link href="/sniffer" className="nav-link active">Royalty Sniffer</Link>
+            <Link href="/splits" className="nav-link">Splits</Link>
+            <Link href="/reclaim" className="nav-link">Reclaim</Link>
+            <Link href="/pricing" className="nav-link">Pricing</Link>
+          </div>
+          <div className="nav-right">
+            <div className="nav-hit">
+              <button className="theme-toggle" type="button" aria-label="Toggle light mode" onClick={toggleTheme}>
+                <svg className="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
+                <svg className="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+              </button>
+            </div>
+            <div className="nav-hit">
+              <button className="nav-cta" type="button" onClick={goCta}>{isLoggedIn ? "My Dashboard" : "Get Started"}</button>
+            </div>
           </div>
         </nav>
 
@@ -834,8 +953,8 @@ function SnifferContent() {
             }}>
               Royalty Sniffer
             </h1>
-            <p style={{ color: "var(--text-secondary)", fontSize: 16, maxWidth: 420, margin: "0 auto", lineHeight: 1.6 }}>
-              Paste your Spotify artist link and see what your music is earning across every platform.
+            <p style={{ color: "var(--text-secondary)", fontSize: 16, margin: "0 auto", lineHeight: 1.6 }}>
+              Paste your Spotify artist link and see what your music is earning.
             </p>
           </div>
 
@@ -1080,6 +1199,33 @@ function SnifferContent() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Footer */}
+        <div className="sniffer-footer" style={{ position: "relative", zIndex: 10, maxWidth: 720, margin: "0 auto", paddingLeft: 24, paddingRight: 24 }}>
+          <div className="footer-grid">
+            <div>
+              <div className="footer-col-title">Legal</div>
+              <a href="/terms" className="footer-link">Terms</a>
+              <a href="/privacy" className="footer-link">Privacy Policy</a>
+            </div>
+            <div>
+              <div className="footer-col-title">Docs</div>
+              <a href="/docs" className="footer-link">FAQs</a>
+              <a href="/docs" className="footer-link">White paper</a>
+            </div>
+            <div>
+              <div className="footer-col-title">Social</div>
+              <div className="social-col">
+                <a href="https://x.com/wavcash" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="X (Twitter)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+                </a>
+                <a href="mailto:hello@wavcash.com" className="social-icon" aria-label="Email">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>
