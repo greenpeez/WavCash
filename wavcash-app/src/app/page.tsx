@@ -969,6 +969,7 @@ export default function HomePage() {
   const isLoggedIn = ready && authenticated;
 
   const goSniffer = () => router.push("/sniffer");
+  const goSplits = () => router.push("/splits");
   const goSnifferWithQuery = () => {
     if (searchQuery.trim()) {
       router.push(`/sniffer?q=${encodeURIComponent(searchQuery.trim())}`);
@@ -1002,7 +1003,7 @@ export default function HomePage() {
             <div className="nav-links">
               <div className={`nav-menu-items${navOpen ? " open" : ""}`}>
                 <button className="nav-link" type="button" onClick={goSniffer}>Royalty Sniffer</button>
-                <button className="nav-link" type="button">Splits</button>
+                <button className="nav-link" type="button" onClick={goSplits}>Splits</button>
                 <button className="nav-link" type="button">Reclaim</button>
                 <button className="nav-link" type="button">Pricing</button>
               </div>
@@ -1023,11 +1024,6 @@ export default function HomePage() {
 
           {/* Hero */}
           <div className="hero">
-            <div className="hero-badge">
-              <span className="dot" />
-              <span className="hw">Now</span> <span className="hw">in</span> <span className="hw">Private</span> <span className="hw">Beta</span>
-            </div>
-
             <h1>
               <span className="hw">Your</span>{" "}
               <span className="hw word-royalties">royalties,</span>
