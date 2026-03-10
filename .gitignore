@@ -20,3 +20,4 @@ contracts/package-lock.json
 # Local tooling config
 .claude/
 .vercel
+CLAUDE.md
