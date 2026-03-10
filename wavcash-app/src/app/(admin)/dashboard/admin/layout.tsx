@@ -22,7 +22,7 @@ export default function AdminLayout({
 
   useEffect(() => {
     if (ready && !authenticated) {
-      router.replace("/login");
+      router.replace("/login?redirect=/dashboard/admin/data-requests");
     }
   }, [ready, authenticated, router]);
 

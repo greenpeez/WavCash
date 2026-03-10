@@ -322,8 +322,19 @@ function LoginContent() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/dashboard";
+  const redirectParam = searchParams.get("redirect");
+  const redirect = redirectParam ||
+    (typeof window !== "undefined" ? sessionStorage.getItem("wavcash-login-redirect") : null) ||
+    "/dashboard";
   const signToken = searchParams.get("sign_token");
+
+  // Persist redirect to sessionStorage so it survives OAuth round-trips
+  // (Privy strips custom query params when returning from Google/Spotify)
+  useEffect(() => {
+    if (redirectParam) {
+      try { sessionStorage.setItem("wavcash-login-redirect", redirectParam); } catch {}
+    }
+  }, [redirectParam]);
 
   const { ready, authenticated } = usePrivy();
   const { wallets } = useWallets();
@@ -370,6 +381,9 @@ function LoginContent() {
     // Prevent concurrent calls from onComplete + useEffect racing
     if (authHandled.current) return;
     authHandled.current = true;
+
+    // Clean up persisted redirect now that auth is complete
+    try { sessionStorage.removeItem("wavcash-login-redirect"); } catch {}
 
     // Admin routes handle their own auth — skip user profile check
     if (redirect.startsWith("/dashboard/admin")) {

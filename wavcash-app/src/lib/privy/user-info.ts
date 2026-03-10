@@ -29,7 +29,16 @@ export async function getPrivyUserInfo(userId: string): Promise<{
       ) {
         walletAddress = account.address as string;
       } else if (account.type === "email" && "address" in account) {
+        // Direct email login — takes priority over OAuth-derived emails
         email = (account.address as string).toLowerCase();
+      } else if (
+        !email &&
+        (account.type === "google_oauth" || account.type === "spotify_oauth") &&
+        "email" in account &&
+        account.email
+      ) {
+        // Google/Spotify OAuth — email is on .email, not .address
+        email = (account.email as string).toLowerCase();
       } else if (account.type === "phone" && "number" in account) {
         phone = account.number as string;
       }
