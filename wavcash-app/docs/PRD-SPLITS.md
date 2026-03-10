@@ -202,8 +202,8 @@ Adding a new ERC-20 token requires only adding an entry to the `SUPPORTED_TOKENS
 **Process:**
 1. Fetches all active splits with deployed contracts
 2. **Contract state check (separate pass):** Reads on-chain `state()` for each contract in its own try/catch. Contracts not in Active state (1) are skipped. Contracts without `state()` (old RoyaltySplitter) fall through to AVAX distribution without joining the token pass.
-3. **Native AVAX pass:** For each contract, checks balance. If > 0, calls `distributeAll()`, logs to `distributions` table, notifies contributors. Records which contracts confirmed Active for the ERC-20 pass.
-4. **ERC-20 token pass:** Only attempted on contracts confirmed Active in step 2. For each supported token (USDC, EURC), checks token balance. If > 0, calls `distributeAllToken()`, logs, notifies. Contracts that revert with empty data (v1 WavCashSplit without `distributeAllToken()`) are silently skipped — no error log, no DB write.
+3. **Native AVAX pass:** For each contract, checks balance. If >= 0.0001 AVAX, calls `distributeAll()`, logs to `distributions` table, notifies contributors. Dust amounts below this threshold are skipped to avoid pointless activity entries and notifications. Records which contracts confirmed Active for the ERC-20 pass.
+4. **ERC-20 token pass:** Only attempted on contracts confirmed Active in step 2. For each supported token (USDC, EURC), checks token balance. If >= $0.01, calls `distributeAllToken()`, logs, notifies. Dust amounts below threshold are skipped. Contracts that revert with empty data (v1 WavCashSplit without `distributeAllToken()`) are silently skipped — no error log, no DB write.
 5. **Fee retry:** After each successful distribution, checks for stuck fees and retries `collectFees()` / `collectTokenFees()`
 6. Returns stats: `{ distributed, skipped, failed, token_stats, results }`
 
