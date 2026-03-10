@@ -370,6 +370,13 @@ function LoginContent() {
     // Prevent concurrent calls from onComplete + useEffect racing
     if (authHandled.current) return;
     authHandled.current = true;
+
+    // Admin routes handle their own auth — skip user profile check
+    if (redirect.startsWith("/dashboard/admin")) {
+      router.push(redirect);
+      return;
+    }
+
     // Build query string to thread sign_token through the flow
     const qs = signToken ? `?sign_token=${signToken}` : "";
     try {

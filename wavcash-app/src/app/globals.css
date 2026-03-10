@@ -752,6 +752,25 @@ iframe[title*="privy" i],
   transform: scale(0.97);
 }
 
+/* ---- ADMIN SHELL (normal cursors, no atom cursor) ---- */
+.admin-shell,
+.admin-shell *,
+.admin-shell *::before,
+.admin-shell *::after {
+  cursor: default !important;
+}
+.admin-shell button,
+.admin-shell a,
+.admin-shell [role="button"],
+.admin-shell select,
+.admin-shell summary {
+  cursor: pointer !important;
+}
+.admin-shell input:not([type="checkbox"]):not([type="radio"]),
+.admin-shell textarea {
+  cursor: text !important;
+}
+
 /* ---- CONTRACT IN-PAGE VIEW ---- */
 /* Force ALL text in the contract viewer to follow the theme.
    The generated HTML has inline color:#1a1a1a / #666 / #999 which are

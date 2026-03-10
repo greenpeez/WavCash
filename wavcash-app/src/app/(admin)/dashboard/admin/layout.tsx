@@ -28,19 +28,19 @@ export default function AdminLayout({
 
   if (!ready || !authenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-[var(--color-amber)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
-      <header className="border-b border-[var(--border-subtle)] px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+    <div className="admin-shell dashboard-shell min-h-screen bg-background">
+      <header className="sticky top-0 z-50 flex items-center justify-between h-[64px] px-10 bg-[var(--bg-surface)] border-b border-[var(--border-subtle)] backdrop-blur-xl">
+        <div className="flex items-center gap-2.5" style={{ fontFamily: "var(--font-general-sans), 'General Sans', sans-serif" }}>
           <svg
-            width="22"
-            height="18"
+            width="24"
+            height="20"
             viewBox="0 0 26 22"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -51,15 +51,15 @@ export default function AdminLayout({
             <line x1="17" y1="4" x2="17" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
             <line x1="20.5" y1="6" x2="20.5" y2="16" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" opacity="0.3" />
           </svg>
-          <span className="font-semibold text-sm">WavCash</span>
-          <span className="text-xs text-[var(--text-tertiary)] bg-[var(--bg-surface)] px-2 py-0.5 rounded">
+          <span className="text-lg font-bold tracking-tight text-[var(--text-primary)]">WavCash</span>
+          <span className="text-[11px] text-[var(--color-amber)] bg-[rgba(212,136,58,0.1)] px-2 py-0.5 rounded font-medium">
             Admin
           </span>
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg hover:bg-[var(--bg-surface)] transition-colors"
+            className="dash-header-theme-btn"
+            onClick={() => { const next = theme === "dark" ? "light" : "dark"; setTheme(next); try { localStorage.setItem("wavcash-theme", next); } catch {} }}
             aria-label="Toggle theme"
           >
             {mounted ? (
@@ -69,18 +69,18 @@ export default function AdminLayout({
             )}
           </button>
           <button
+            className="dash-header-theme-btn"
             onClick={async () => {
               await logout();
               window.location.href = "/login";
             }}
-            className="p-2 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-red-500 transition-colors"
             aria-label="Sign out"
           >
             <LogOut className="h-4 w-4" />
           </button>
         </div>
       </header>
-      <main className="max-w-4xl mx-auto px-6 py-8">
+      <main className="max-w-4xl mx-auto px-10 py-8">
         {children}
       </main>
     </div>
