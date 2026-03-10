@@ -970,6 +970,7 @@ export default function HomePage() {
 
   const goSniffer = () => router.push("/sniffer");
   const goSplits = () => router.push("/splits");
+  const goReclaim = () => router.push("/reclaim");
   const goPricing = () => router.push("/pricing");
   const goSnifferWithQuery = () => {
     if (searchQuery.trim()) {
@@ -1005,7 +1006,7 @@ export default function HomePage() {
               <div className={`nav-menu-items${navOpen ? " open" : ""}`}>
                 <button className="nav-link" type="button" onClick={goSniffer}>Royalty Sniffer</button>
                 <button className="nav-link" type="button" onClick={goSplits}>Splits</button>
-                <button className="nav-link" type="button">Reclaim</button>
+                <button className="nav-link" type="button" onClick={goReclaim}>Reclaim</button>
                 <button className="nav-link" type="button" onClick={goPricing}>Pricing</button>
               </div>
               <button className={`nav-product-toggle${navOpen ? " open" : ""}`} type="button" onClick={() => setNavOpen(true)}>
