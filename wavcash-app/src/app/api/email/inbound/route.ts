@@ -18,6 +18,7 @@ import {
  * 3. Fetch full email body via Resend Received Emails API
  * 4. Insert into `data_requests` table
  * 5. Send acknowledgment email back to sender
+ * 6. Notify all admins (in-app + email)
  */
 export async function POST(request: Request) {
   try {
@@ -98,7 +99,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to log request" }, { status: 500 });
     }
 
-    // Send acknowledgment email
+    // Send acknowledgment email to the sender
     const today = new Date().toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -125,6 +126,41 @@ export async function POST(request: Request) {
       });
     } catch (err) {
       console.error("Failed to send acknowledgment email:", err);
+      // Non-critical — the request is still logged
+    }
+
+    // Notify all admins — in-app notifications + email alerts
+    try {
+      const { data: admins } = await supabase
+        .from("admin_allowlist")
+        .select("email");
+
+      if (admins && admins.length > 0) {
+        const senderDisplay = senderName || senderEmail;
+        const notifTitle = `New data request ${inserted.reference}`;
+        const notifBody = `${senderDisplay} submitted a data rights request${subject ? `: ${subject}` : ""}`;
+
+        // Insert in-app notifications for each admin
+        const notifRows = admins.map((a) => ({
+          admin_email: a.email.toLowerCase(),
+          title: notifTitle,
+          body: notifBody,
+          metadata: { reference: inserted.reference, sender_email: senderEmail },
+        }));
+
+        await supabase.from("admin_notifications").insert(notifRows);
+
+        // Send email alert to each admin
+        const adminEmails = admins.map((a) => a.email);
+        await resend.emails.send({
+          from: "WavCash Admin <privacy@noreply.wav.cash>",
+          to: adminEmails,
+          subject: `[Admin] New data request ${inserted.reference} from ${senderDisplay}`,
+          text: `A new data rights request has been received.\n\nReference: ${inserted.reference}\nFrom: ${senderDisplay} (${senderEmail})\nSubject: ${subject || "(no subject)"}\nDate: ${today}\n\nView in admin dashboard: https://admin.wav.cash`,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to notify admins:", err);
       // Non-critical — the request is still logged
     }
 
