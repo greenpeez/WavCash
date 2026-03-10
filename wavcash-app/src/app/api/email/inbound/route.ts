@@ -37,9 +37,9 @@ export async function POST(request: Request) {
       event = resend.webhooks.verify({
         payload: rawBody,
         headers: {
-          id: request.headers.get("webhook-id") || "",
-          timestamp: request.headers.get("webhook-timestamp") || "",
-          signature: request.headers.get("webhook-signature") || "",
+          id: request.headers.get("svix-id") || "",
+          timestamp: request.headers.get("svix-timestamp") || "",
+          signature: request.headers.get("svix-signature") || "",
         },
         webhookSecret: secret,
       });
