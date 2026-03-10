@@ -68,7 +68,7 @@ export default function AtomCursor() {
     let isVisible = false; // opacity-based visibility — keeps position tracking alive
 
     const hideSelectors =
-      "button, a, input, textarea, select, [role=button], label, .dash-header-hit";
+      "button, a, input, textarea, select, [role=button], label, .dash-header-hit, .wc-cookie-banner-inner";
     const collapseSelectors = "[data-slot=card], [data-cursor=collapse]";
 
     // Single mousemove handler replaces separate mouseover/mouseout

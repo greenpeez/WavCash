@@ -629,7 +629,8 @@ interface ContractData {
 
 | File | Purpose |
 |------|---------|
-| `src/app/(auth)/dashboard/splits/page.tsx` | Splits list page |
+| `src/app/(public)/splits/page.tsx` | Public splits landing page (product info, no auth required) |
+| `src/app/(auth)/dashboard/splits/page.tsx` | Splits list page (authenticated) |
 | `src/app/(auth)/dashboard/splits/new/page.tsx` | Multi-step split creation wizard |
 | `src/app/(auth)/dashboard/splits/[id]/page.tsx` | Split detail page (contract view, signing, distribution, void) |
 | `src/app/(public)/sign/[token]/page.tsx` | Public signing page (no auth to view, auth to sign) |

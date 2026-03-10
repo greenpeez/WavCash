@@ -62,8 +62,9 @@ Authentication gates all protected features. The system uses Privy for identity 
 | `src/lib/privy/server.ts` | Privy server client singleton |
 | `src/app/api/user/route.ts` | GET: fetch user, POST: update profile |
 | `src/app/api/user/register/route.ts` | POST: create user on first login |
-| `src/middleware.ts` | Route protection via Privy cookies |
-| `src/app/layout.tsx` | Root layout with PrivyProviderWrapper |
+| `src/middleware.ts` | Route protection via Privy cookies + geo cookie |
+| `src/app/layout.tsx` | Root layout with PrivyProviderWrapper, CookieBanner |
+| `src/components/cookie-banner.tsx` | EU-only cookie consent banner |
 
 ---
 
@@ -194,7 +195,8 @@ Singleton `PrivyClient` initialized with `appId` + `appSecret`. Used server-side
 ```typescript
 const publicPaths = [
   "/", "/login", "/signup", "/sniffer", "/sign",
-  "/spotify-callback", "/docs", "/faq", "/terms", "/privacy"
+  "/spotify-callback", "/docs", "/splits", "/pricing",
+  "/faq", "/terms", "/privacy", "/data-request"
 ]
 ```
 
@@ -207,6 +209,22 @@ const hasToken = request.cookies.has("privy-token")
 
 if (!hasToken && !isPublicPath) {
   redirect to /login?redirect={pathname}
+}
+```
+
+**Geo Cookie (EU detection):**
+
+The middleware sets a `wc-geo` cookie on every response (if not already present) using Vercel's `x-vercel-ip-country` header. This enables the client-side cookie consent banner to show only for EU/EEA/UK visitors. Falls back to `"XX"` when the header is absent (local dev).
+
+```typescript
+function withGeoCookie(request, response) {
+  if (!request.cookies.has("wc-geo")) {
+    const country = request.headers.get("x-vercel-ip-country") || "XX";
+    response.cookies.set("wc-geo", country, {
+      path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax",
+    });
+  }
+  return response;
 }
 ```
 

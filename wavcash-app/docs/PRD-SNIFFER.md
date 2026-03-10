@@ -56,8 +56,13 @@ const [result, setResult] = useState(null)    // API response data
 
 **Header Navigation:**
 - WavCash logo (links to `/`)
-- Nav links: Royalty Sniffer (active), Splits, Reclaim, Pricing
-- Right side: Theme toggle + CTA button (conditional on Privy auth state)
+- Nav links: Royalty Sniffer (active), Splits (`/splits`), Reclaim, Pricing (`/pricing`)
+- Right side: Theme toggle + CTA button ("Get Started" or "My Dashboard", conditional on Privy auth state)
+
+**Footer:**
+- Legal: Terms (`/terms`), Privacy Policy (`/privacy`)
+- Docs: FAQs (`/docs`), White paper (`/docs`)
+- Social: X (`x.com/wavcash`), Email (`hello@wav.cash`)
 
 **UI Sections (conditional rendering based on `result`):**
 

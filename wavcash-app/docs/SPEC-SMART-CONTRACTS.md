@@ -21,7 +21,7 @@ WavCash uses two Solidity contracts on Avalanche C-Chain to manage royalty split
 
 ## 1. WavCashSplit
 
-The primary contract. Deployed when a creator sends a split agreement for signatures. Contributors don't pay gas — they sign EIP-712 typed data from their Privy embedded wallet, and the deployer relays the signature on-chain. Supports both native AVAX and ERC-20 token distribution (USDC).
+The primary contract. Deployed when a creator sends a split agreement for signatures. Contributors don't pay gas — they sign EIP-712 typed data from their Privy embedded wallet, and the deployer relays the signature on-chain. Supports both native AVAX and ERC-20 token distribution (USDC, EURC).
 
 > **Note:** Contracts are immutable once deployed. Only newly deployed splits include ERC-20 support. Existing live contracts remain AVAX-only.
 
@@ -258,7 +258,7 @@ netPayout = pending - (pending * feeBasisPoints / 10000)
 ```
 wavcash-app/src/lib/contracts/
 ├── deploy.ts              — deployWavCashSplit(), deployRoyaltySplitter(), verifyOnSnowTrace()
-├── interact.ts            — read/write wrappers (getPayees, distributeAll, distributeAllToken, registerSigner, etc.)
+├── interact.ts            — read/write wrappers, token addresses (USDC, EURC), SUPPORTED_TOKENS array
 ├── WavCashSplit.json      — ABI + bytecode artifact
 ├── WavCashSplit.input.json — Standard JSON input (for Snowtrace verification)
 ├── RoyaltySplitter.json
@@ -364,23 +364,26 @@ For each active split with a deployed contract:
 4. Notify each contributor: "You received ~X AVAX from {title}"
 5. Check `getPendingFees()` — retry stuck fees via `callCollectFees()`
 
-**Pass 2 — USDC (ERC-20):**
+**Pass 2 — ERC-20 Tokens (USDC, EURC):**
 
-For each active split with a deployed contract:
+Iterates over the `SUPPORTED_TOKENS` array. For each token, for each active split with a deployed contract:
 
-1. `hasDistributableTokenBalance(contractAddress, USDC_ADDRESS)` — skip if zero
-2. `callDistributeAllTokenSplit(contractAddress, USDC_ADDRESS)` — pushes USDC to all signers
-3. Log distribution to `distributions` table with `token_type: "usdc"`
-4. Notify each contributor: "You received ~$X.XX USDC from {title}"
+1. `hasDistributableTokenBalance(contractAddress, tokenAddress)` — skip if balance below $0.01 (10000 raw units for 6-decimal tokens)
+2. `callDistributeAllTokenSplit(contractAddress, tokenAddress)` — pushes tokens to all signers
+3. Log distribution to `distributions` table with `token_type` set to the token's `dbKey` (e.g., `"usdc"` or `"eurc"`)
+4. Notify each contributor: "You received ~$X.XX {SYMBOL} from {title}"
 5. Check `getPendingTokenFees()` — retry stuck token fees via `callCollectTokenFees()`
 
-USDC uses 6 decimals (not 18). Amounts are formatted accordingly.
+Both USDC and EURC use 6 decimals. Amounts are formatted accordingly.
 
-**USDC addresses** (determined by `NEXT_PUBLIC_CHAIN_ID`):
-- Mainnet (43114): `0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E`
-- Fuji (43113): `0x5425890298aed601595a70AB815c96711a756143`
+**Supported ERC-20 tokens** (determined by `NEXT_PUBLIC_CHAIN_ID`):
 
-Per-split try/catch — one failure doesn't stop others. AVAX and USDC failures are tracked independently.
+| Token | Mainnet (43114) | Fuji (43113) |
+|---|---|---|
+| USDC | `0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E` | `0x5425890298aed601595a70AB815c96711a31Bc65` |
+| EURC | `0xC891EB4cbdEFf6e073e859e987815Ed1505c2ACD` | `0x5E44db7996c682E92a960b65AC713a54AD815c6B` |
+
+Per-split try/catch — one failure doesn't stop others. AVAX and token failures are tracked independently per token type.
 
 ### Fee Math Example
 
@@ -393,7 +396,7 @@ Payee A:   9.75 × 6000 / 10000 = 5.85 AVAX (60%)
 Payee B:   9.75 × 4000 / 10000 = 3.90 AVAX (40%)
 ```
 
-**USDC (6 decimals):**
+**ERC-20 (6 decimals — USDC, EURC):**
 ```
 Input:     1000 USDC (1000000000 raw), fee = 2.5% (250 bps)
 Fee:       1000000000 × 250 / 10000 = 25000000 (25 USDC) → feeRecipient
@@ -401,6 +404,8 @@ Net:       1000000000 − 25000000 = 975000000 (975 USDC)
 Payee A:   975000000 × 6000 / 10000 = 585000000 ($585.00 USDC, 60%)
 Payee B:   975000000 × 4000 / 10000 = 390000000 ($390.00 USDC, 40%)
 ```
+
+EURC follows the same math — both use 6 decimals.
 
 ---
 
@@ -530,7 +535,7 @@ The script hardcodes known contract addresses and constructor args, then calls t
 |---|---|---|
 | `split_id` | UUID (FK → splits) | |
 | `tx_hash` | TEXT | Distribution transaction |
-| `token_type` | TEXT | `native` (AVAX) or `usdc` |
+| `token_type` | TEXT | `native` (AVAX), `usdc`, or `eurc` |
 | `total_amount` | TEXT | Human-readable amount |
 | `status` | TEXT | `success`, `partial`, `failed` |
 
@@ -659,12 +664,13 @@ Both configs include Snowtrace API key via `etherscan.apiKey.avalancheFujiTestne
 │      │        │  Retry stuck fees      │                          │
 │      │        └────────────────────────┘                          │
 │      │              │                                             │
-│      │        ┌─ Pass 2: USDC (ERC-20) ─┐                        │
-│      │        │  Check USDC balance      │                        │
-│      │        │  distributeAllToken()    │                        │
-│      │        │  Log + notify            │                        │
-│      │        │  Retry stuck token fees  │                        │
-│      │        └──────────────────────────┘                        │
+│      │        ┌─ Pass 2: ERC-20 (USDC, EURC) ─┐                   │
+│      │        │  For each SUPPORTED_TOKEN:     │                  │
+│      │        │    Check token balance          │                  │
+│      │        │    distributeAllToken()         │                  │
+│      │        │    Log + notify                 │                  │
+│      │        │    Retry stuck token fees       │                  │
+│      │        └────────────────────────────────┘                  │
 └──────┴────────────────────────────────────────────────────────────┘
 ```
 
@@ -681,6 +687,6 @@ After Snowtrace verification, transactions display as:
 | ACTIVATED | (implicit in last `registerSigner`) | Same tx as final SIGNED |
 | VOIDED | `void_()` | "Void" |
 | PAYMENT | `distributeAll()` | "Distribute All" |
-| PAYMENT (USDC) | `distributeAllToken()` | "Distribute All Token" |
+| PAYMENT (ERC-20) | `distributeAllToken()` | "Distribute All Token" |
 
 The `WavCashAction` event emits a string label (`"CREATED"`, `"SIGNED"`, `"ACTIVATED"`, `"PAYMENT"`, `"VOIDED"`) that also appears in the explorer's event logs tab.

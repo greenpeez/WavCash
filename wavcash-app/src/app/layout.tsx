@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import PrivyProviderWrapper from "@/components/providers/privy-provider";
 import { SupportWidget } from "@/components/support/SupportWidget";
 import GlobalCursor from "@/components/global-cursor";
+import { CookieBanner } from "@/components/cookie-banner";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -61,6 +62,7 @@ export default function RootLayout({
             <GlobalCursor />
             <SupportWidget />
             <Toaster />
+            <CookieBanner />
           </ThemeProvider>
         </PrivyProviderWrapper>
       </body>

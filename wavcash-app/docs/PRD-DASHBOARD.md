@@ -44,6 +44,9 @@ The dashboard reads from `oracle_snapshots` joined with `tracks` and `dsp_rates`
 | `src/components/dashboard/platform-donut.tsx` | Platform earnings donut chart |
 | `src/components/dashboard/mercury-canvas.tsx` | WebGL background canvas |
 | `src/components/dashboard/animated-icons.tsx` | Animated nav icons |
+| `src/components/dashboard/walkthrough.tsx` | First-time user onboarding walkthrough (7 steps) |
+| `src/components/dashboard/atom-cursor.tsx` | Animated atom SVG cursor replacement |
+| `src/components/cookie-banner.tsx` | EU-only cookie consent banner (global, in layout.tsx) |
 | `src/components/support/SupportWidget.tsx` | Floating support chat widget |
 | `src/components/support/ChatBox.tsx` | Support ticket chat interface |
 | `src/lib/hooks/use-auth-swr.ts` | Auth-aware SWR hook |
@@ -242,6 +245,66 @@ const PLATFORM_COLORS: Record<string, string> = {
 
 ---
 
+## Walkthrough (`walkthrough.tsx`)
+
+**Component:** `Walkthrough` (client component, desktop only)
+
+A 7-step guided tour that runs on first dashboard visit. Highlights sidebar nav items and explains each section. Skipped on mobile (sidebar is hidden).
+
+**Steps:**
+1. Welcome (centered dialog)
+2. Dashboard (highlights nav, explains earnings overview)
+3. Tracks (highlights nav, explains catalog)
+4. Actuals (highlights nav, explains statement upload)
+5. Splits (highlights nav, explains agreement creation)
+6. Reclaim (highlights nav, explains CMO registration)
+7. Complete (centered dialog, "You're all set!")
+
+Completion tracked via `POST /api/user/complete-walkthrough`.
+
+---
+
+## Atom Cursor (`atom-cursor.tsx`)
+
+**Component:** `AtomCursor` (client component, dynamic import with `ssr: false`)
+
+Custom animated SVG cursor replacement (36x36 atom with 3 orbiting electrons + nucleus). Replaces the system cursor via global `cursor: none !important`.
+
+**Behavior Modes:**
+- **Normal areas:** Full atom (orbits + electrons + nucleus)
+- **Cards** (`[data-slot=card]`, `[data-cursor=collapse]`): Smooth collapse to nucleus dot only
+- **Buttons/links/inputs:** Fully hidden (opacity 0), system cursor restored where overridden
+
+**Hide selectors** (cursor fully hides):
+```
+button, a, input, textarea, select, [role=button], label, .dash-header-hit, .wc-cookie-banner-inner
+```
+
+**Collapse selectors** (cursor collapses to dot):
+```
+[data-slot=card], [data-cursor=collapse]
+```
+
+The cookie banner card (`.wc-cookie-banner-inner`) and its children use `cursor: default !important` to override the global `cursor: none` and show the system arrow pointer.
+
+---
+
+## Cookie Banner (`cookie-banner.tsx`)
+
+**Component:** `CookieBanner` (client component, global in `layout.tsx`)
+
+EU-only GDPR cookie consent banner. Only shows for visitors from EU/EEA/UK countries.
+
+**Detection:** Reads `wc-geo` cookie (set by middleware from Vercel's `x-vercel-ip-country` header). Checks against a set of 31 country codes (27 EU + 3 EEA + UK).
+
+**Consent Storage:** `localStorage` key `wc-cookie-consent` with values `"all"` or `"necessary"`.
+
+**UI:** Fixed bottom bar with two buttons: "Necessary only" (secondary) and "Accept all" (primary). Links to `/privacy#cookies`. Solid opaque backgrounds (not frosted glass) for reliable contrast in both themes.
+
+**Future-ready:** When Google Analytics is added, it should check `localStorage.getItem('wc-cookie-consent')` before loading the gtag script.
+
+---
+
 ## Support Widget
 
 ### SupportWidget (`src/components/support/SupportWidget.tsx`)
@@ -318,3 +381,5 @@ CREATE TABLE public.oracle_snapshots (
 5. **No export** — Can't export earnings data as CSV or PDF.
 6. **No per-track detail page** — Clicking a track in the table doesn't go anywhere.
 7. **Settings page is placeholder** — Shows "Coming soon."
+8. **Reclaim page is placeholder** — Shows "Coming soon." Listed in sidebar nav but not yet functional.
+9. **Google Analytics not yet implemented** — Privacy policy documents it, cookie consent banner is ready for it, but no gtag script exists in the codebase yet.

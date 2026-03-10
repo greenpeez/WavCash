@@ -53,6 +53,7 @@ Additionally, each upload feeds the **self-calibrating oracle** — a system tha
 | `src/app/(auth)/dashboard/actuals/page.tsx` | Actuals page (upload + results UI) |
 | `src/app/api/actuals/upload/route.ts` | CSV upload and parsing API |
 | `src/app/api/actuals/match/route.ts` | ISRC matching + rate comparison + calibration trigger |
+| `src/app/api/actuals/discrepancies/route.ts` | GET: fetch flagged discrepancies for a statement |
 | `src/lib/csv/parser.ts` | Distributor-specific CSV parser |
 | `src/lib/oracle/rates.ts` | Rate resolver (fallback chain) |
 | `src/lib/oracle/calibrate.ts` | Calibration engine (bias protection) |
