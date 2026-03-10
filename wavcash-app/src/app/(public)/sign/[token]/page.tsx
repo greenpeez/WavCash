@@ -195,9 +195,15 @@ export default function SignPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       })
-        .then(res => res.ok ? res.json() : null)
+        .then(res => {
+          if (res.ok) return res.json();
+          // Wrong account logged in — stop redirecting so user can tap "Review Document"
+          // which will send them through login with the correct identity
+          if (res.status === 403) { setRedirecting(false); return null; }
+          return null;
+        })
         .then(result => {
-          router.push(`/dashboard/splits/${result?.split_id || data.split.id}`);
+          if (result) router.push(`/dashboard/splits/${result.split_id || data.split.id}`);
         })
         .catch(() => {
           router.push(`/dashboard/splits/${data.split.id}`);
@@ -214,9 +220,17 @@ export default function SignPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       })
-        .then(res => res.ok ? res.json() : null)
+        .then(res => {
+          if (res.ok) return res.json();
+          // Wrong account — send through login so the correct user can authenticate
+          if (res.status === 403) {
+            router.push(`/login?sign_token=${params.token}`);
+            return null;
+          }
+          return null;
+        })
         .then(result => {
-          router.push(`/dashboard/splits/${result?.split_id || data.split.id}`);
+          if (result) router.push(`/dashboard/splits/${result.split_id || data.split.id}`);
         })
         .catch(() => {
           router.push(`/dashboard/splits/${data.split.id}`);

@@ -49,6 +49,35 @@ export async function POST(
       );
     }
 
+    // ── Verify the authenticated user is the intended contributor ─────
+    // If another user already claimed this token, reject.
+    if (contributor.user_id && contributor.user_id !== auth.userId) {
+      return NextResponse.json(
+        { error: "This invite belongs to a different account" },
+        { status: 403 }
+      );
+    }
+
+    // Fetch the authenticated user's profile for email verification + legal_name sync
+    const { data: userProfile } = await supabase
+      .from("users")
+      .select("legal_name, email")
+      .eq("id", auth.userId)
+      .single();
+
+    // If the contributor isn't linked yet, verify email match before linking.
+    // This prevents a logged-in user from claiming someone else's invite token.
+    if (!contributor.user_id) {
+      const userEmail = userProfile?.email?.toLowerCase();
+      const inviteEmail = contributor.email?.toLowerCase();
+      if (inviteEmail && userEmail && userEmail !== inviteEmail) {
+        return NextResponse.json(
+          { error: "Your account email does not match this invite" },
+          { status: 403 }
+        );
+      }
+    }
+
     // Link user_id if not already linked
     const updates: Record<string, unknown> = {};
 
@@ -63,15 +92,7 @@ export async function POST(
     // Sync legal_name from user profile → contributor record.
     // The user's self-declared legal_name (set during onboarding) takes
     // precedence over what the creator originally typed.
-    // Safe: legal_name is DB-only, never stored on-chain.
-    // Also backfill users.email from the invite email if missing.
-    if (!contributor.user_id || contributor.user_id !== auth.userId) {
-      const { data: userProfile } = await supabase
-        .from("users")
-        .select("legal_name, email")
-        .eq("id", auth.userId)
-        .single();
-
+    if (!contributor.user_id) {
       if (userProfile?.legal_name) {
         updates.legal_name = userProfile.legal_name;
       }

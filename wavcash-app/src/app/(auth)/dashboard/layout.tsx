@@ -146,6 +146,11 @@ function DashboardLayoutInner({
           router.replace(`/dashboard/splits/${data.split_id}`);
           return;
         }
+        // Wrong account — send to login so the correct user can authenticate
+        if (res.status === 403) {
+          router.replace(`/login?sign_token=${signToken}`);
+          return;
+        }
       } catch {
         // Non-critical — just redirect to splits list
       }
