@@ -105,10 +105,10 @@ awaiting_signatures -> active (auto, on final EIP-712 signature)
     - Notifies all linked users via `agreement_voided` notification
 23. Signing page shows "This agreement has been voided" for any future link clicks
 
-### Distribution (Manual)
+### Distribution
 
-24. On active split detail page, creator can click "Distribute" to trigger manual distribution
-25. POST to `/api/splits/{id}/distribute`
+24. Automated via cron job every 5 minutes (see Distribution Pipeline below)
+25. Manual trigger available via `POST /api/splits/{id}/distribute` (no UI button currently)
 26. Distributes both native AVAX and all supported ERC-20 tokens (USDC, EURC) if balances exist
 27. Logs each distribution to the `distributions` table
 28. Notifies each contributor with their estimated share amount
@@ -212,7 +212,7 @@ Adding a new ERC-20 token requires only adding an entry to the `SUPPORTED_TOKENS
 **Endpoint:** `POST /api/splits/{id}/distribute`
 **Auth:** Required (must be creator or contributor)
 
-Same logic as cron but scoped to a single split. Used by the "Distribute" button on the split detail page.
+Same logic as cron but scoped to a single split. No frontend UI button currently; callable via API only.
 
 ### Distribution Notifications
 

@@ -47,16 +47,16 @@ export async function POST(request: Request) {
 
     // Rate limiting and duplicate checks only apply to anonymous users
     if (!isAuthenticated) {
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const { count } = await supabase
         .from("sniffer_results")
         .select("*", { count: "exact", head: true })
         .eq("ip_hash", ipHash)
-        .gte("created_at", oneHourAgo);
+        .gte("created_at", oneDayAgo);
 
-      if (count && count >= 2) {
+      if (count && count >= 1) {
         return NextResponse.json(
-          { error: "Rate limit reached. You can run 2 searches per hour. Try again later." },
+          { error: "You've used your free search for today. Sign up to unlock unlimited searches." },
           { status: 429 }
         );
       }

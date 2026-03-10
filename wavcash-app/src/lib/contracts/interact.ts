@@ -172,13 +172,15 @@ export async function callDistributeAllToken(
 
 /**
  * Checks if a contract has any distributable AVAX balance.
+ * Ignores dust amounts below 0.0001 AVAX (100000000000000 wei).
  */
+const MIN_AVAX_WEI = 100000000000000n; // 0.0001 AVAX
 export async function hasDistributableBalance(
   contractAddress: `0x${string}`
 ): Promise<{ hasBalance: boolean; balance: string }> {
   const balance = await getContractBalance(contractAddress);
   return {
-    hasBalance: balance > 0n,
+    hasBalance: balance >= MIN_AVAX_WEI,
     balance: formatEther(balance),
   };
 }
@@ -398,8 +400,9 @@ export async function getTokenBalance(
 
 /**
  * Check if a contract has distributable ERC-20 token balance.
- * USDC uses 6 decimals.
+ * Ignores dust amounts below $0.01 (10000 units for 6-decimal tokens).
  */
+const MIN_TOKEN_UNITS_6 = 10000n; // $0.01 for 6-decimal tokens (USDC, EURC)
 export async function hasDistributableTokenBalance(
   contractAddress: `0x${string}`,
   tokenAddress: `0x${string}`,
@@ -407,8 +410,9 @@ export async function hasDistributableTokenBalance(
 ): Promise<{ hasBalance: boolean; balance: string }> {
   const balance = await getTokenBalance(contractAddress, tokenAddress);
   const divisor = 10 ** decimals;
+  const minUnits = decimals === 6 ? MIN_TOKEN_UNITS_6 : BigInt(10 ** Math.max(decimals - 2, 0));
   return {
-    hasBalance: balance > 0n,
+    hasBalance: balance >= minUnits,
     balance: (Number(balance) / divisor).toFixed(decimals),
   };
 }
