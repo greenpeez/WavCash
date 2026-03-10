@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { authFetch } from "@/lib/auth/client";
 import { useAuthSWR } from "@/lib/hooks/use-auth-swr";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,8 +17,6 @@ import {
   Send,
   Loader2,
   ShieldAlert,
-  UserPlus,
-  X,
 } from "lucide-react";
 
 interface DataRequest {
@@ -34,11 +32,6 @@ interface DataRequest {
   original_subject: string | null;
   original_body: string | null;
   resend_email_id: string | null;
-  created_at: string;
-}
-
-interface AllowlistEntry {
-  email: string;
   created_at: string;
 }
 
@@ -84,21 +77,10 @@ export default function AdminDataRequestsPage() {
     return res.json();
   });
 
-  const {
-    data: allowlist,
-    mutate: mutateAllowlist,
-  } = useAuthSWR<AllowlistEntry[]>("admin-allowlist", async () => {
-    const res = await authFetch("/api/admin/allowlist");
-    if (!res.ok) return [];
-    return res.json();
-  });
-
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [completionText, setCompletionText] = useState("");
   const [sending, setSending] = useState(false);
   const [editingName, setEditingName] = useState<Record<string, string>>({});
-  const [newEmail, setNewEmail] = useState("");
-  const [addingEmail, setAddingEmail] = useState(false);
 
   const updateRequest = useCallback(
     async (id: string, fields: Record<string, unknown>) => {
@@ -141,42 +123,6 @@ export default function AdminDataRequestsPage() {
       }
     },
     [completionText, editingName, mutate]
-  );
-
-  const handleAddEmail = useCallback(async () => {
-    const email = newEmail.trim().toLowerCase();
-    if (!email || !email.includes("@")) return;
-    setAddingEmail(true);
-    try {
-      const res = await authFetch("/api/admin/allowlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      if (res.ok) {
-        setNewEmail("");
-        mutateAllowlist();
-      }
-    } finally {
-      setAddingEmail(false);
-    }
-  }, [newEmail, mutateAllowlist]);
-
-  const handleRemoveEmail = useCallback(
-    async (email: string) => {
-      const res = await authFetch("/api/admin/allowlist", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      if (res.ok) {
-        mutateAllowlist();
-      } else {
-        const err = await res.json();
-        alert(err.error || "Failed to remove");
-      }
-    },
-    [mutateAllowlist]
   );
 
   // Access denied
@@ -443,61 +389,6 @@ export default function AdminDataRequestsPage() {
           })}
         </div>
       )}
-
-      {/* Admin Allowlist */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Admin Allowlist</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Current admins */}
-          {allowlist && allowlist.length > 0 && (
-            <div className="space-y-1">
-              {allowlist.map((entry) => (
-                <div
-                  key={entry.email}
-                  className="flex items-center justify-between py-1.5 text-sm"
-                >
-                  <span>{entry.email}</span>
-                  <button
-                    onClick={() => handleRemoveEmail(entry.email)}
-                    className="text-[var(--text-tertiary)] hover:text-red-500 transition-colors p-1"
-                    title="Remove"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Add new */}
-          <div className="flex items-center gap-2">
-            <input
-              type="email"
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleAddEmail();
-              }}
-              placeholder="email@example.com"
-              className="flex-1 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-md px-2 py-1.5 text-sm"
-            />
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={!newEmail.trim() || addingEmail}
-              onClick={handleAddEmail}
-            >
-              {addingEmail ? (
-                <Loader2 className="w-3 h-3 animate-spin" />
-              ) : (
-                <UserPlus className="w-3 h-3" />
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

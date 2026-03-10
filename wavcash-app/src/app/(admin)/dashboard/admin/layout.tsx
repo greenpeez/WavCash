@@ -1,10 +1,17 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import { usePrivy } from "@privy-io/react-auth";
-import { Sun, Moon, LogOut, Bell } from "lucide-react";
+import { Sun, Moon, LogOut, Bell, Mail, Banknote, Settings } from "lucide-react";
 import { useTheme } from "next-themes";
+
+const ADMIN_NAV = [
+  { href: "/dashboard/admin/data-requests", label: "Data Requests", icon: Mail },
+  { href: "/dashboard/admin/distributions", label: "Distributions", icon: Banknote },
+  { href: "/dashboard/admin/settings", label: "Settings", icon: Settings },
+];
 import { authFetch } from "@/lib/auth/client";
 import { useAuthSWR } from "@/lib/hooks/use-auth-swr";
 
@@ -25,6 +32,7 @@ export default function AdminLayout({
 }) {
   const { ready, authenticated, user: privyUser, logout } = usePrivy();
   const router = useRouter();
+  const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -205,8 +213,31 @@ export default function AdminLayout({
           </button>
         </div>
       </header>
-      <main className="max-w-4xl mx-auto px-10 py-8">
-        {children}
+
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+        <nav className="space-y-1">
+          {ADMIN_NAV.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`admin-sidebar-link${isActive ? " active" : ""}`}
+              >
+                <item.icon />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+
+      {/* Main content */}
+      <main className="admin-main">
+        <div className="admin-main-content">
+          {children}
+        </div>
       </main>
     </div>
   );
