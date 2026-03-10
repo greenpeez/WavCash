@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
-import { verifyAuth } from "@/lib/auth/verify";
+import { verifyAdmin } from "@/lib/auth/verify-admin";
 
 /**
  * GET /api/admin/data-requests
@@ -8,7 +8,7 @@ import { verifyAuth } from "@/lib/auth/verify";
  */
 export async function GET() {
   try {
-    await verifyAuth();
+    await verifyAdmin();
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -34,7 +34,7 @@ export async function GET() {
  */
 export async function PATCH(request: Request) {
   try {
-    await verifyAuth();
+    await verifyAdmin();
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

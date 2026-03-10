@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
-import { verifyAuth } from "@/lib/auth/verify";
+import { verifyAdmin } from "@/lib/auth/verify-admin";
 import { getResendClient } from "@/lib/email/client";
 import {
   buildCompletionEmailHtml,
@@ -18,7 +18,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await verifyAuth();
+    await verifyAdmin();
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
