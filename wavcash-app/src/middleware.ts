@@ -17,6 +17,27 @@ function withGeoCookie(request: NextRequest, response: NextResponse) {
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const hostname = request.headers.get("host") || "";
+
+  // Admin subdomain: redirect root to admin dashboard, block non-admin hosts
+  const isAdminHost =
+    hostname === "admin.wav.cash" ||
+    hostname.startsWith("localhost") ||
+    hostname.startsWith("127.0.0.1");
+
+  if (isAdminHost && pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard/admin/data-requests";
+    return NextResponse.redirect(url);
+  }
+
+  if (pathname.startsWith("/dashboard/admin") && !isAdminHost) {
+    const url = request.nextUrl.clone();
+    url.hostname = "wav.cash";
+    url.pathname = "/";
+    url.port = "";
+    return NextResponse.redirect(url);
+  }
 
   // Skip API routes (they handle their own auth)
   if (pathname.startsWith("/api/")) {
