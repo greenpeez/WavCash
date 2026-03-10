@@ -69,6 +69,14 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Missing email" }, { status: 400 });
     }
 
+    // Prevent removing the primary admin
+    if (email.toLowerCase() === "ibukun.oyewumij@gmail.com") {
+      return NextResponse.json(
+        { error: "Cannot remove the primary admin" },
+        { status: 400 }
+      );
+    }
+
     // Prevent removing yourself
     if (email.toLowerCase() === adminEmail.toLowerCase()) {
       return NextResponse.json(

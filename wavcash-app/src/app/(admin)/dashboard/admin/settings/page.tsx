@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserPlus, X, Loader2, ShieldAlert } from "lucide-react";
 
+const PROTECTED_ADMIN = "ibukun.oyewumij@gmail.com";
+
 interface AllowlistEntry {
   email: string;
   created_at: string;
@@ -102,13 +104,15 @@ export default function AdminSettingsPage() {
                   className="flex items-center justify-between py-1.5 text-sm"
                 >
                   <span>{entry.email}</span>
-                  <button
-                    onClick={() => handleRemoveEmail(entry.email)}
-                    className="text-[var(--text-tertiary)] hover:text-red-500 transition-colors p-1"
-                    title="Remove"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
+                  {entry.email.toLowerCase() !== PROTECTED_ADMIN && (
+                    <button
+                      onClick={() => handleRemoveEmail(entry.email)}
+                      className="text-[var(--text-tertiary)] hover:text-red-500 transition-colors p-1"
+                      title="Remove"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
