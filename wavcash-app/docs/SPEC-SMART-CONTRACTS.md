@@ -350,6 +350,15 @@ The user clicks "Sign" on the agreement page. The hook:
 
 ## 5. Distribution
 
+### Distribution Triggers
+
+Distribution can be triggered three ways:
+1. **Automated cron** — `GET /api/cron/distribute` (every 5 minutes, all active splits)
+2. **User manual** — `POST /api/splits/{id}/distribute` (creator or contributor, single split)
+3. **Admin manual** — `POST /api/admin/distributions/{splitId}` (admin only via `verifyAdmin()`, no ownership check, single split — failsafe from admin dashboard)
+
+All three use the same underlying contract calls (`distributeAll()`, `distributeAllToken()`), DB logging, and contributor notifications.
+
 ### Cron Job: `GET /api/cron/distribute`
 
 Runs every 5 minutes via Vercel Cron. Protected by `CRON_SECRET`. Two distribution passes per cycle:

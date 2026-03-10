@@ -108,10 +108,11 @@ awaiting_signatures -> active (auto, on final EIP-712 signature)
 ### Distribution
 
 24. Automated via cron job every 5 minutes (see Distribution Pipeline below)
-25. Manual trigger available via `POST /api/splits/{id}/distribute` (no UI button currently)
-26. Distributes both native AVAX and all supported ERC-20 tokens (USDC, EURC) if balances exist
-27. Logs each distribution to the `distributions` table
-28. Notifies each contributor with their estimated share amount
+25. Manual trigger available via `POST /api/splits/{id}/distribute` (creator or contributor)
+26. Admin manual trigger via `POST /api/admin/distributions/{splitId}` (admin only, no ownership check — failsafe for when cron fails)
+27. Distributes both native AVAX and all supported ERC-20 tokens (USDC, EURC) if balances exist
+28. Logs each distribution to the `distributions` table
+29. Notifies each contributor with their estimated share amount
 
 ---
 
@@ -209,10 +210,15 @@ Adding a new ERC-20 token requires only adding an entry to the `SUPPORTED_TOKENS
 
 ### Manual Distribution
 
-**Endpoint:** `POST /api/splits/{id}/distribute`
+**User endpoint:** `POST /api/splits/{id}/distribute`
 **Auth:** Required (must be creator or contributor)
 
 Same logic as cron but scoped to a single split. No frontend UI button currently; callable via API only.
+
+**Admin endpoint:** `POST /api/admin/distributions/{splitId}`
+**Auth:** Required (admin only via `verifyAdmin()`, no ownership check)
+
+Same distribution logic but accessible from the admin Distributions page. Admins look up a split by ISRC, see contributors, contract balances, and activity history, then trigger distribution with a single button. Acts as a failsafe when the automated cron fails.
 
 ### Distribution Notifications
 
@@ -379,6 +385,12 @@ Notifications are stored in the `notifications` table and displayed via the dash
 4. Log distributions, notify contributors
 5. Retry stuck fees
 6. Return `{ success, avax, tokens, tx_hashes }`
+
+### `POST /api/admin/distributions/[splitId]`
+
+**Auth:** Required (admin only — `verifyAdmin()`, no ownership check)
+
+**Processing:** Same as user-facing distribute endpoint above, but accessible to admins for any active split. Used as a failsafe from the admin Distributions page.
 
 ### `GET /api/splits/[id]/contract`
 
@@ -639,6 +651,10 @@ interface ContractData {
 | `src/app/api/splits/[id]/void/route.ts` | POST: void agreement (on-chain + DB) |
 | `src/app/api/splits/[id]/contract/route.ts` | GET: generate contract HTML/text with live signatures |
 | `src/app/api/splits/[id]/distribute/route.ts` | POST: manual distribution trigger (AVAX + ERC-20) |
+| `src/app/api/admin/distributions/lookup/route.ts` | GET: look up split by ISRC (returns track, split, contributors, events, distributions) |
+| `src/app/api/admin/distributions/balance/route.ts` | GET: check AVAX + token balances on a contract |
+| `src/app/api/admin/distributions/[splitId]/route.ts` | POST: admin distribution trigger (no ownership check) |
+| `src/app/(admin)/dashboard/admin/distributions/page.tsx` | Admin distributions page (ISRC lookup, activity timeline, balances, distribute) |
 | `src/app/api/sign/[token]/route.ts` | GET: load signing data, POST: EIP-712 sign + register on-chain |
 | `src/app/api/cron/distribute/route.ts` | GET: automated distribution cron job |
 | `src/lib/contracts/generate.ts` | Contract text/HTML generator (14 sections + Exhibit A + live signatures) |
