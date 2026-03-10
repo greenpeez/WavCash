@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const publicPaths = ["/", "/login", "/signup", "/sniffer", "/sign", "/spotify-callback", "/docs", "/splits", "/pricing", "/faq", "/terms", "/privacy", "/data-request"];
+const publicPaths = ["/", "/login", "/signup", "/sniffer", "/sign", "/spotify-callback", "/docs", "/splits", "/pricing", "/faq", "/terms", "/privacy", "/data-request", "/reclaim"];
 
 /** Set wc-geo cookie from Vercel's geo header (once, on first visit). */
 function withGeoCookie(request: NextRequest, response: NextResponse) {
