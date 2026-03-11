@@ -303,6 +303,9 @@ const DOCS_CSS = `
 .docs-root .footer-grid {
   display: flex; justify-content: center; gap: 80px;
 }
+.docs-root .footer-grid > div {
+  display: flex; flex-direction: column; align-items: center;
+}
 .docs-root .footer-col-title {
   font-family: 'JetBrains Mono', monospace;
   font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
@@ -679,9 +682,9 @@ export default function DocsPage() {
           </Link>
           <div className="nav-links">
             <button className="nav-link" type="button" onClick={() => router.push("/sniffer")}>Royalty Sniffer</button>
-            <button className="nav-link" type="button">Splits</button>
-            <button className="nav-link" type="button">Reclaim</button>
-            <button className="nav-link" type="button">Pricing</button>
+            <button className="nav-link" type="button" onClick={() => router.push("/splits")}>Splits</button>
+            <button className="nav-link" type="button" onClick={() => router.push("/reclaim")}>Reclaim</button>
+            <button className="nav-link" type="button" onClick={() => router.push("/pricing")}>Pricing</button>
           </div>
           <div className="nav-right">
             <div className="nav-hit">
@@ -790,7 +793,7 @@ export default function DocsPage() {
 
               <h3 className="section-subtitle">Reclaim: CMO Registration Guide</h3>
               <p className="body-text">Reclaim is a guided registration tool that helps rights holders navigate CMO registration in their territory. WavCash prepares the complete submission package: pre-filled forms using catalog data and profile data already stored in the system. Rights holders review the package, upload required documents, and receive step-by-step instructions for submitting through the CMO&#39;s own channel.</p>
-              <p className="body-text">WavCash does not submit to CMOs directly. CMOs do not have public submission APIs and registration happens through portals, email, or physical mail. WavCash prepares. The rights holder submits. Status tracking and reminder emails keep the process moving.</p>
+              <p className="body-text">WavCash does not submit to CMOs directly. Registration happens through portals, email, or physical mail. WavCash prepares, and the rights holder submits. In-app status tracking and reminder emails keep the process moving.</p>
               <p className="body-text">Reclaim covers MCSN and COSON (Nigeria), PAVRISK and KAMP (Kenya), SAMRO, CAPASSO, and SAMPRA (South Africa), ECAD, ABRAMUS, and UBC (Brazil), and GHAMRO (Ghana). Each registration wizard includes a per-track payout toggle, default on, that configures routing of distributor royalties through WavCash for instant local settlement or USDC.</p>
 
               <h3 className="section-subtitle">Enterprise Multi-Seat Dashboard</h3>
