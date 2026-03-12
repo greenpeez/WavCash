@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 
     const trackMap: Record<string, string> = {};
     for (const t of tracks || []) {
-      trackMap[t.isrc.toUpperCase()] = t.id;
+      if (t.isrc) trackMap[t.isrc.toUpperCase()] = t.id;
     }
 
     // Get user's country for rate resolution
@@ -93,6 +93,22 @@ export async function POST(request: Request) {
 
       matched++;
 
+      // Publisher lines (income_type is set): match by ISRC but skip oracle
+      // comparison — publishing royalties aren't comparable to stream-based estimates
+      if (line.income_type) {
+        await supabase
+          .from("statement_lines")
+          .update({
+            matched_track_id: trackId,
+            oracle_estimated: null,
+            delta_pct: null,
+            flagged: false,
+          })
+          .eq("id", line.id);
+        continue;
+      }
+
+      // Distributor lines: full oracle comparison
       const platform = (line.platform || "spotify").toLowerCase().replace(/\s+/g, "_");
       const lineCountry = line.country || userCountry;
       const period = line.period || new Date().toISOString().slice(0, 7);

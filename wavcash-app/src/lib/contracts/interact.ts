@@ -4,7 +4,9 @@ import {
   http,
   type Hex,
   formatEther,
+  formatUnits,
   erc20Abi,
+  decodeEventLog,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { avalanche, avalancheFuji } from "viem/chains";
@@ -489,4 +491,77 @@ export async function callCollectTokenFees(
   }
 
   return hash;
+}
+
+// ─── Event Reading (per-contributor payout amounts) ──────
+
+export interface PayoutEvent {
+  account: `0x${string}`;
+  amount: bigint;
+  amountDecimal: string;
+  tokenAddress?: `0x${string}`;
+}
+
+/**
+ * Read PaymentReleased and TokenPaymentReleased events from a distribution
+ * transaction receipt. Returns exact per-contributor payout amounts.
+ */
+export async function getDistributionEventsFromTx(
+  txHash: `0x${string}`,
+  tokenType: "native" | string = "native"
+): Promise<PayoutEvent[]> {
+  const client = getPublicClient();
+  const receipt = await client.getTransactionReceipt({ hash: txHash });
+
+  const events: PayoutEvent[] = [];
+
+  // Determine decimals for formatting
+  const decimals = tokenType === "native" ? 18 : 6; // USDC/EURC are 6 decimals
+
+  for (const log of receipt.logs) {
+    try {
+      if (tokenType === "native") {
+        // Decode PaymentReleased(address indexed account, uint256 amount)
+        const decoded = decodeEventLog({
+          abi: splitAbi,
+          data: log.data,
+          topics: log.topics,
+          eventName: "PaymentReleased",
+        });
+        if (decoded.args && "account" in decoded.args && "amount" in decoded.args) {
+          const account = decoded.args.account as `0x${string}`;
+          const amount = decoded.args.amount as bigint;
+          events.push({
+            account,
+            amount,
+            amountDecimal: formatEther(amount),
+          });
+        }
+      } else {
+        // Decode TokenPaymentReleased(address indexed token, address indexed account, uint256 amount)
+        const decoded = decodeEventLog({
+          abi: splitAbi,
+          data: log.data,
+          topics: log.topics,
+          eventName: "TokenPaymentReleased",
+        });
+        if (decoded.args && "account" in decoded.args && "amount" in decoded.args) {
+          const tokenAddr = (decoded.args as Record<string, unknown>).token as `0x${string}`;
+          const account = decoded.args.account as `0x${string}`;
+          const amount = decoded.args.amount as bigint;
+          events.push({
+            account,
+            amount,
+            amountDecimal: formatUnits(amount, decimals),
+            tokenAddress: tokenAddr,
+          });
+        }
+      }
+    } catch {
+      // Not a matching event log, skip
+      continue;
+    }
+  }
+
+  return events;
 }

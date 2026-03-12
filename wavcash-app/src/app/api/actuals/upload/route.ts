@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyAuth } from "@/lib/auth/verify";
 import { createServiceClient } from "@/lib/supabase/server";
-import { parseDistributorCsv } from "@/lib/csv/parser";
+import { parseStatementCsv, isPublisherSource } from "@/lib/csv/parser";
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     }
 
     const csvText = await file.text();
-    const { lines, errors } = parseDistributorCsv(csvText, distributor);
+    const { lines, errors } = parseStatementCsv(csvText, distributor);
 
     if (lines.length === 0) {
       return NextResponse.json(
@@ -42,12 +42,16 @@ export async function POST(request: Request) {
       0
     );
 
+    // Determine statement type (publisher vs distributor)
+    const statementType = isPublisherSource(distributor) ? "publisher" : "distributor";
+
     // Create statement record
     const { data: statement, error: stmtError } = await supabase
       .from("royalty_statements")
       .insert({
         user_id: userId,
         distributor,
+        statement_type: statementType,
         upload_filename: file.name,
         period_start: periodStart,
         period_end: periodEnd,
@@ -64,7 +68,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Insert line items
+    // Insert line items (publisher fields will be null for distributor CSVs)
     const lineRows = lines.map((l) => ({
       statement_id: statement.id,
       isrc: l.isrc,
@@ -74,6 +78,11 @@ export async function POST(request: Request) {
       earnings: l.earnings,
       period: l.period,
       country: l.country,
+      income_type: l.income_type,
+      source_name: l.source_name,
+      iswc: l.iswc,
+      share_received: l.share_received,
+      gross_earnings: l.gross_earnings,
     }));
 
     const { error: linesError } = await supabase
@@ -82,6 +91,12 @@ export async function POST(request: Request) {
 
     if (linesError) {
       console.error("Failed to insert statement lines:", linesError);
+      // Clean up the orphaned statement record
+      await supabase.from("royalty_statements").delete().eq("id", statement.id);
+      return NextResponse.json(
+        { error: "Failed to save statement line items. Please try again." },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({

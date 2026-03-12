@@ -876,7 +876,7 @@ export default function SplitsPage() {
               <div style={{ flex: 1, minWidth: 280 }}>
                 <p className="body-text">Every song has multiple creators. Producers, co-writers, featured artists, engineers. Splits are often governed by verbal agreements, DMs, and informal trust.</p>
                 <p className="body-text">When money arrives, disputes follow, friendships break, projects stall, and payouts on catalogs get frozen while people argue over who owns what.</p>
-                <p className="body-text">Agreement should be put in writing before anyone gets paid. WavCash makes that effortless.</p>
+                <p className="body-text">Agreements should be put in writing before anyone gets paid. WavCash makes that effortless.</p>
                 <a href="#how-it-works" className="inline-link" onClick={(e) => { e.preventDefault(); document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" }); }}>
                   Get Started &rarr;
                 </a>
@@ -1078,7 +1078,7 @@ export default function SplitsPage() {
               </div>
               <div>
                 <div className="footer-col-title">Docs</div>
-                <a href="/docs" className="footer-link">FAQs</a>
+                <a href="/faq" className="footer-link">FAQs</a>
                 <a href="/docs" className="footer-link">White paper</a>
               </div>
               <div>

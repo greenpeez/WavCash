@@ -992,7 +992,7 @@ export default function PricingPage() {
               </div>
               <div>
                 <div className="footer-col-title">Docs</div>
-                <a href="/docs" className="footer-link">FAQs</a>
+                <a href="/faq" className="footer-link">FAQs</a>
                 <a href="/docs" className="footer-link">White paper</a>
               </div>
               <div>

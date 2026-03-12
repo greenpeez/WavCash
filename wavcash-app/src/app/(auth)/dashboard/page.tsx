@@ -15,20 +15,27 @@ import {
   Disc3,
   ArrowRight,
   Shield,
+  Eye,
 } from "lucide-react";
 import { EarningsChart } from "@/components/dashboard/earnings-chart";
 import { PlatformDonut } from "@/components/dashboard/platform-donut";
 import { useAuthSWR } from "@/lib/hooks/use-auth-swr";
 
+type DataSource = "actuals" | "oracle" | "mixed";
+
 interface SummaryData {
-  totalEstimated: number;
+  totalEarnings: number;
+  masterEarnings: number;
+  publishingEarnings: number;
+  splitEarnings: number;
   last12Months: number;
   topTrack: { title: string; earnings: number } | null;
   topPlatform: { name: string; percentage: number } | null;
-  monthlyData: { month: string; earnings: number }[];
+  monthlyData: { month: string; earnings?: number; master: number; publishing: number }[];
   platformData: { platform: string; earnings: number; color: string }[];
   trackCount: number;
   hasData: boolean;
+  dataSource: DataSource;
 }
 
 interface DashboardData {
@@ -44,16 +51,30 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-const EMPTY_SUMMARY: SummaryData = {
-  totalEstimated: 0,
-  last12Months: 0,
-  topTrack: null,
-  topPlatform: null,
-  monthlyData: [],
-  platformData: [],
-  trackCount: 0,
-  hasData: false,
-};
+function DataSourceBadge({ source }: { source: DataSource }) {
+  if (source === "oracle") {
+    return (
+      <Badge variant="secondary" className="mt-2 text-[10px]">
+        <Eye className="h-3 w-3 mr-1" />
+        Oracle Estimate
+      </Badge>
+    );
+  }
+  if (source === "mixed") {
+    return (
+      <Badge variant="secondary" className="mt-2 text-[10px]">
+        <Shield className="h-3 w-3 mr-1" />
+        Master + Publishing
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="secondary" className="mt-2 text-[10px]">
+      <Shield className="h-3 w-3 mr-1" />
+      Verified
+    </Badge>
+  );
+}
 
 export default function DashboardPage() {
   const { user: privyUser, ready } = usePrivy();
@@ -111,6 +132,9 @@ export default function DashboardPage() {
   }
 
   const summary = data?.summary;
+  const dataSource = summary?.dataSource || "oracle";
+  const isOracle = dataSource === "oracle";
+  const hasBreakdown = !isOracle && (summary?.publishingEarnings ?? 0) > 0;
 
   return (
     <div className="space-y-6">
@@ -130,19 +154,14 @@ export default function DashboardPage() {
           <CardContent className="py-5">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-[family-name:var(--font-jetbrains)] uppercase tracking-wider text-[var(--text-tertiary)] font-bold">
-                Total Estimated
+                {isOracle ? "Total Estimated" : "Total Earnings"}
               </p>
               <DollarSign className="h-4 w-4 text-[var(--accent)]" />
             </div>
             <p className="font-[family-name:var(--font-jetbrains)] text-2xl font-bold">
-              {summary?.hasData ? formatCurrency(summary.totalEstimated) : "—"}
+              {summary?.hasData ? formatCurrency(summary.totalEarnings) : "—"}
             </p>
-            {summary?.hasData && (
-              <Badge variant="secondary" className="mt-2 text-[10px]">
-                <Shield className="h-3 w-3 mr-1" />
-                Verified
-              </Badge>
-            )}
+            {summary?.hasData && <DataSourceBadge source={dataSource} />}
           </CardContent>
         </Card>
 
@@ -157,6 +176,16 @@ export default function DashboardPage() {
             <p className="font-[family-name:var(--font-jetbrains)] text-2xl font-bold">
               {summary?.hasData ? formatCurrency(summary.last12Months) : "—"}
             </p>
+            {hasBreakdown && (
+              <div className="mt-2 space-y-0.5">
+                <p className="text-[10px] text-[var(--text-tertiary)]">
+                  Master: {formatCurrency(summary?.masterEarnings ?? 0)}
+                </p>
+                <p className="text-[10px] text-[var(--text-tertiary)]">
+                  Publishing: {formatCurrency(summary?.publishingEarnings ?? 0)}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -211,7 +240,10 @@ export default function DashboardPage() {
               <CardTitle className="text-base">Monthly Earnings</CardTitle>
             </CardHeader>
             <CardContent>
-              <EarningsChart data={summary.monthlyData} />
+              <EarningsChart
+                data={summary.monthlyData}
+                hasBreakdown={hasBreakdown}
+              />
             </CardContent>
           </Card>
 
@@ -234,6 +266,14 @@ export default function DashboardPage() {
           </span>{" "}
           tracks in catalog
         </span>
+        {(summary?.splitEarnings ?? 0) > 0 && (
+          <span>
+            <span className="font-[family-name:var(--font-jetbrains)] font-bold text-[var(--text-primary)]">
+              {formatCurrency(summary!.splitEarnings)}
+            </span>{" "}
+            from splits
+          </span>
+        )}
       </div>
     </div>
   );

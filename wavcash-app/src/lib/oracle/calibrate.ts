@@ -44,11 +44,14 @@ export async function calibrateFromStatement(
     rates_updated: 0,
   };
 
-  // Get matched statement lines with streams and earnings
+  // Get matched distributor statement lines with streams and earnings.
+  // Publisher lines (income_type IS NOT NULL) are excluded — their earnings
+  // represent publishing royalties, not per-stream master rates.
   const { data: lines } = await supabase
     .from("statement_lines")
     .select("id, platform, country, streams, earnings, period")
     .eq("statement_id", statementId)
+    .is("income_type", null)
     .not("matched_track_id", "is", null)
     .gt("streams", 0)
     .gt("earnings", 0);

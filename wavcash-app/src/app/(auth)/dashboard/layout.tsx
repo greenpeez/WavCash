@@ -16,7 +16,7 @@ import {
   AniMusic,
   AniFileSpreadsheet,
   AniSplit,
-  AniShield,
+  AniLockOpen,
   AniSettings,
   AniLogOut,
 } from "@/components/dashboard/animated-icons";
@@ -37,7 +37,7 @@ const NAV_ITEMS = [
   { href: "/dashboard/tracks", label: "Tracks", icon: AniMusic },
   { href: "/dashboard/actuals", label: "Actuals", icon: AniFileSpreadsheet },
   { href: "/dashboard/splits", label: "Splits", icon: AniSplit },
-  { href: "/dashboard/reclaim", label: "Reclaim", icon: AniShield },
+  { href: "/dashboard/reclaim", label: "Reclaim", icon: AniLockOpen },
   { href: "/dashboard/settings", label: "Settings", icon: AniSettings },
 ];
 

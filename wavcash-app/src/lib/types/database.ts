@@ -76,10 +76,13 @@ export interface OracleSnapshot {
   created_at: string;
 }
 
+export type StatementType = "distributor" | "publisher";
+
 export interface RoyaltyStatement {
   id: string;
   user_id: string;
   distributor: string;
+  statement_type: StatementType;
   upload_filename: string | null;
   period_start: string | null;
   period_end: string | null;
@@ -102,6 +105,12 @@ export interface StatementLine {
   oracle_estimated: number | null;
   delta_pct: number | null;
   flagged: boolean;
+  // Publisher-specific fields (null for distributor CSVs)
+  income_type: string | null;
+  source_name: string | null;
+  iswc: string | null;
+  share_received: number | null;
+  gross_earnings: number | null;
   created_at: string;
 }
 
@@ -144,6 +153,17 @@ export interface Distribution {
   created_at: string;
 }
 
+export interface DistributionPayout {
+  id: string;
+  distribution_id: string;
+  wallet_address: string;
+  token_type: string;
+  amount: string;
+  amount_decimal: number | null;
+  tx_hash: string;
+  created_at: string;
+}
+
 export interface CmoRegistration {
   id: string;
   user_id: string;
@@ -152,6 +172,7 @@ export interface CmoRegistration {
   selected_track_ids: string[];
   documents: CmoDocument[];
   personal_info: Record<string, string>;
+  current_step: string;
   submission_date: string | null;
   rejection_reason: string | null;
   notes: string | null;
@@ -178,6 +199,13 @@ export interface CmoDirectory {
   required_documents: CmoRequiredDocument[];
   processing_time: string | null;
   notes: string | null;
+  region: string | null;
+  self_registration: boolean;
+  registration_cost: string | null;
+  royalty_category: string | null;
+  accepts_international: boolean;
+  publisher_registration: boolean;
+  display_order: number;
 }
 
 export interface CmoRequiredDocument {

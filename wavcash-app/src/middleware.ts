@@ -20,10 +20,7 @@ export async function middleware(request: NextRequest) {
   const hostname = request.headers.get("host") || "";
 
   // Admin subdomain: redirect root to admin dashboard, block non-admin hosts
-  const isAdminHost =
-    hostname === "admin.wav.cash" ||
-    hostname.startsWith("localhost") ||
-    hostname.startsWith("127.0.0.1");
+  const isAdminHost = hostname === "admin.wav.cash";
 
   if (isAdminHost && pathname === "/") {
     const url = request.nextUrl.clone();

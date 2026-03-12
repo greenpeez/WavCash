@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyAuth } from "@/lib/auth/verify";
 import { createServiceClient } from "@/lib/supabase/server";
+import { reconcileEarnings } from "@/lib/earnings/reconcile";
 
 const PLATFORM_LABELS: Record<string, string> = {
   spotify: "Spotify",
@@ -8,6 +9,15 @@ const PLATFORM_LABELS: Record<string, string> = {
   youtube_music: "YouTube Music",
   amazon_music: "Amazon Music",
   tidal: "Tidal",
+  deezer: "Deezer",
+  tiktok: "TikTok",
+  audiomack: "Audiomack",
+  anghami: "Anghami",
+  pandora: "Pandora",
+  iheart: "iHeart",
+  soundcloud: "SoundCloud",
+  meta: "Meta",
+  vevo: "Vevo",
 };
 
 const PLATFORM_COLORS: Record<string, string> = {
@@ -16,6 +26,15 @@ const PLATFORM_COLORS: Record<string, string> = {
   youtube_music: "#FF0000",
   amazon_music: "#00A8E1",
   tidal: "#000000",
+  deezer: "#A238FF",
+  tiktok: "#010101",
+  audiomack: "#FFA200",
+  anghami: "#D81B60",
+  pandora: "#224099",
+  iheart: "#C6002B",
+  soundcloud: "#FF5500",
+  meta: "#0668E1",
+  vevo: "#ED1B24",
 };
 
 export async function GET() {
@@ -35,7 +54,10 @@ export async function GET() {
       return NextResponse.json({
         spotifyConnected,
         summary: {
-          totalEstimated: 0,
+          totalEarnings: 0,
+          masterEarnings: 0,
+          publishingEarnings: 0,
+          splitEarnings: 0,
           last12Months: 0,
           topTrack: null,
           topPlatform: null,
@@ -43,13 +65,50 @@ export async function GET() {
           platformData: [],
           trackCount: 0,
           hasData: false,
+          dataSource: "oracle" as const,
         },
       });
     }
 
+    // Try reconciled earnings first (actuals + splits)
+    const reconciled = await reconcileEarnings(supabase, userId);
+
+    if (reconciled) {
+      // User has actuals or split data — return reconciled view
+      const topPlatform = reconciled.platformData[0]
+        ? {
+            name: reconciled.platformData[0].platform,
+            percentage:
+              reconciled.totalEarnings > 0
+                ? Math.round(
+                    (reconciled.platformData[0].earnings / reconciled.totalEarnings) * 100
+                  )
+                : 0,
+          }
+        : null;
+
+      return NextResponse.json({
+        spotifyConnected,
+        summary: {
+          totalEarnings: reconciled.totalEarnings,
+          masterEarnings: reconciled.masterEarnings,
+          publishingEarnings: reconciled.publishingEarnings,
+          splitEarnings: reconciled.splitEarnings,
+          last12Months: reconciled.last12Months,
+          topTrack: reconciled.topTrack,
+          topPlatform,
+          monthlyData: reconciled.monthlyData,
+          platformData: reconciled.platformData,
+          trackCount: reconciled.trackCount,
+          hasData: true,
+          dataSource: reconciled.dataSource,
+        },
+      });
+    }
+
+    // Fallback: oracle-only estimates (existing behavior)
     const artistIds = artistsRes.data.map((a) => a.id);
 
-    // Batch 2: count + tracks
     const [countRes, tracksRes] = await Promise.all([
       supabase.from("tracks").select("*", { count: "exact", head: true }).in("artist_id", artistIds),
       supabase.from("tracks").select("id, title").in("artist_id", artistIds),
@@ -57,7 +116,6 @@ export async function GET() {
 
     const trackIds = tracksRes.data?.map((t) => t.id) || [];
 
-    // Batch 3: snapshots
     const { data: snapshots } = await supabase
       .from("oracle_snapshots")
       .select("track_id, platform, estimated_royalty, snapshot_date")
@@ -68,7 +126,10 @@ export async function GET() {
       return NextResponse.json({
         spotifyConnected,
         summary: {
-          totalEstimated: 0,
+          totalEarnings: 0,
+          masterEarnings: 0,
+          publishingEarnings: 0,
+          splitEarnings: 0,
           last12Months: 0,
           topTrack: null,
           topPlatform: null,
@@ -76,17 +137,17 @@ export async function GET() {
           platformData: [],
           trackCount: countRes.count || 0,
           hasData: false,
+          dataSource: "oracle" as const,
         },
       });
     }
 
-    // Calculate totals
+    // Calculate oracle totals
     const totalEstimated = snapshots.reduce(
       (sum, s) => sum + (Number(s.estimated_royalty) || 0),
       0
     );
 
-    // Last 12 months
     const twelveMonthsAgo = new Date();
     twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
     const recent = snapshots.filter(
@@ -131,7 +192,7 @@ export async function GET() {
         }
       : null;
 
-    // Monthly data for chart
+    // Monthly data for chart (oracle has single earnings value per month)
     const monthlyMap: Record<string, number> = {};
     for (const s of recent) {
       const month = s.snapshot_date.slice(0, 7);
@@ -146,6 +207,8 @@ export async function GET() {
           year: "2-digit",
         }),
         earnings: Math.round(earnings * 100) / 100,
+        master: Math.round(earnings * 100) / 100,
+        publishing: 0,
       }));
 
     // Platform data for donut
@@ -158,7 +221,10 @@ export async function GET() {
     return NextResponse.json({
       spotifyConnected,
       summary: {
-        totalEstimated,
+        totalEarnings: totalEstimated,
+        masterEarnings: totalEstimated,
+        publishingEarnings: 0,
+        splitEarnings: 0,
         last12Months,
         topTrack,
         topPlatform,
@@ -166,6 +232,7 @@ export async function GET() {
         platformData,
         trackCount: countRes.count || 0,
         hasData: true,
+        dataSource: "oracle" as const,
       },
     });
   } catch {

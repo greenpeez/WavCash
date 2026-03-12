@@ -10,7 +10,9 @@ import { useAuthSWR } from "@/lib/hooks/use-auth-swr";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -32,12 +34,22 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-const DISTRIBUTORS = [
-  { value: "distrokid", label: "DistroKid" },
-  { value: "tunecore", label: "TuneCore" },
-  { value: "amuse", label: "Amuse" },
-  { value: "cd_baby", label: "CD Baby" },
-];
+const SOURCES = {
+  distributors: [
+    { value: "distrokid", label: "DistroKid" },
+    { value: "tunecore", label: "TuneCore" },
+    { value: "amuse", label: "Amuse" },
+    { value: "cd_baby", label: "CD Baby" },
+  ],
+  publishers: [
+    { value: "amra", label: "AMRA" },
+    { value: "songtrust", label: "Songtrust" },
+    { value: "tunecore_publishing", label: "TuneCore Publishing" },
+    { value: "bmi", label: "BMI" },
+    { value: "ascap", label: "ASCAP" },
+    { value: "other_publisher", label: "Other Publisher" },
+  ],
+};
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("en-US", {
@@ -199,7 +211,7 @@ export default function ActualsPage() {
           Actuals
         </h1>
         <p className="text-[var(--text-secondary)] text-sm">
-          Upload distributor statements and detect missing money.
+          Upload distributor or publisher statements and detect missing money.
         </p>
       </div>
 
@@ -211,15 +223,26 @@ export default function ActualsPage() {
         <CardContent className="space-y-4">
           <div className="flex gap-3">
             <Select value={distributor} onValueChange={setDistributor}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Select source" />
               </SelectTrigger>
               <SelectContent>
-                {DISTRIBUTORS.map((d) => (
-                  <SelectItem key={d.value} value={d.value}>
-                    {d.label}
-                  </SelectItem>
-                ))}
+                <SelectGroup>
+                  <SelectLabel>Distributors</SelectLabel>
+                  {SOURCES.distributors.map((d) => (
+                    <SelectItem key={d.value} value={d.value}>
+                      {d.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Publishers</SelectLabel>
+                  {SOURCES.publishers.map((d) => (
+                    <SelectItem key={d.value} value={d.value}>
+                      {d.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
 
@@ -416,7 +439,7 @@ export default function ActualsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>File</TableHead>
-                  <TableHead>Distributor</TableHead>
+                  <TableHead>Source</TableHead>
                   <TableHead className="text-right">Total</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Date</TableHead>
